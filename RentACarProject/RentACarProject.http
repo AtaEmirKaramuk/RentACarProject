@@ -1,0 +1,6 @@
+@RentACarProject_HostAddress = http://localhost:5088
+
+GET {{RentACarProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
