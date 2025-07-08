@@ -9,4 +9,4 @@
         public Guid? CreatedByUserId { get; set; } // Artık GUID
         public Guid? ModifiedByUserId { get; set; } // Artık GUID
     }
-}
+} 
