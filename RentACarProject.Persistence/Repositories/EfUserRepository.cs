@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Domain.Entities;
+using RentACarProject.Domain.Enums; // ✅ Eklenmesi lazım
 using RentACarProject.Persistence.Context;
 
 namespace RentACarProject.Persistence.Repositories
@@ -25,8 +26,11 @@ namespace RentACarProject.Persistence.Repositories
 
         public async Task<List<User>> GetUsersByRoleAsync(string role)
         {
+            if (!Enum.TryParse<UserRole>(role, true, out var parsedRole))
+                return new List<User>();
+
             return await _context.Users
-                .Where(u => u.Role != null && u.Role.ToLower() == role.ToLower())
+                .Where(u => u.Role == parsedRole)
                 .ToListAsync();
         }
 

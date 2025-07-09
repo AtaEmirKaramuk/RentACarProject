@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RentACarProject.Application\RentACarProject.Application.csproj" />
     <ProjectReference Include="..\RentACarProject.Domain\RentACarProject.Domain.csproj" />
     <ProjectReference Include="..\RentACarProject.Infastructure\RentACarProject.Infastructure.csproj" />

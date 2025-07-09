@@ -7,7 +7,6 @@ namespace RentACarProject.Persistence.Context
 {
     public class RentACarDbContext : DbContext
     {
-        // 🟢 Login olan kullanıcının ID'si, service katmanından set edilir (audit için)
         public Guid? CurrentUserId { get; set; }
 
         public RentACarDbContext(DbContextOptions<RentACarDbContext> options)
@@ -27,7 +26,6 @@ namespace RentACarProject.Persistence.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // -------------------------- Global Soft Delete Filter --------------------------
-            // BaseEntity kullanan tüm entity'lere "IsDeleted == false" filtresi uygular.
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
@@ -52,10 +50,7 @@ namespace RentACarProject.Persistence.Context
                 .Property(u => u.Email)
                 .HasMaxLength(100);
 
-            modelBuilder.Entity<User>()
-                .Property(u => u.Role)
-                .HasMaxLength(20)
-                .HasDefaultValue("Customer");
+            // Role enum int olarak saklanıyor, ekstra konfig gerekmez ✅
 
             // -------------------------- Customer --------------------------
             modelBuilder.Entity<Customer>()
@@ -153,14 +148,12 @@ namespace RentACarProject.Persistence.Context
             base.OnModelCreating(modelBuilder);
         }
 
-        // 🔥 Soft delete global filter expression
         private static LambdaExpression GetIsDeletedFilter<TEntity>() where TEntity : BaseEntity
         {
             Expression<Func<TEntity, bool>> filter = x => !x.IsDeleted;
             return filter;
         }
 
-        // 🔥 SaveChanges override - CreatedDate, ModifiedDate, audit işlemleri
         public override int SaveChanges()
         {
             UpdateBaseEntityFields();
@@ -173,7 +166,6 @@ namespace RentACarProject.Persistence.Context
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-        // 🔥 Tüm BaseEntity property'lerini güncelleyen metot
         private void UpdateBaseEntityFields()
         {
             var entries = ChangeTracker.Entries<BaseEntity>();
@@ -192,7 +184,6 @@ namespace RentACarProject.Persistence.Context
                 }
                 else if (entry.State == EntityState.Deleted)
                 {
-                    // Soft delete işlemi: Kaydı silmek yerine "IsDeleted = true" yap
                     entry.State = EntityState.Modified;
                     entry.Entity.IsDeleted = true;
                     entry.Entity.DeletedDate = DateTime.UtcNow;
