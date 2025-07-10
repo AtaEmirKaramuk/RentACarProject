@@ -21,6 +21,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
 
         public async Task<ServiceResponse<LoginResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
+            // ✅ Kullanıcı kontrol
             var user = await _userRepository.GetByUserNameAsync(request.UserName);
             if (user == null)
             {
@@ -32,6 +33,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 };
             }
 
+            // ✅ Şifre kontrol
             var hashedPassword = HashPassword(request.Password);
             if (user.PasswordHash != hashedPassword)
             {
@@ -43,6 +45,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 };
             }
 
+            // ✅ Token oluştur
             var token = _jwtTokenService.GenerateToken(user);
 
             return new ServiceResponse<LoginResponseDto>
@@ -55,7 +58,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                     UserId = user.UserId,
                     UserName = user.UserName,
                     Email = user.Email ?? "",
-                    Role = user.Role.ToString(), // ✅ Enum string olarak dönüştürülüyor
+                    Role = user.Role.ToString(),
                     Token = token
                 }
             };
