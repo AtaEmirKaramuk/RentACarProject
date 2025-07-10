@@ -2,12 +2,13 @@
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Auth;
+using RentACarProject.Application.Features.Auth.Commands;
 using RentACarProject.Domain.Entities;
 using RentACarProject.Domain.Enums;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RentACarProject.Application.Features.Auth.Commands
+namespace RentACarProject.Application.Features.Auth.Handlers
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ServiceResponse<RegisterResponseDto>>
     {

@@ -2,11 +2,12 @@
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Auth;
+using RentACarProject.Application.Features.Auth.Commands;
 using RentACarProject.Application.Services;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RentACarProject.Application.Features.Auth.Commands
+namespace RentACarProject.Application.Features.Auth.Handlers
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, ServiceResponse<LoginResponseDto>>
     {
@@ -21,7 +22,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
 
         public async Task<ServiceResponse<LoginResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            // ✅ Kullanıcı kontrol
+            //  Kullanıcı kontrol
             var user = await _userRepository.GetByUserNameAsync(request.UserName);
             if (user == null)
             {
@@ -33,7 +34,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 };
             }
 
-            // ✅ Şifre kontrol
+            //  Şifre kontrol
             var hashedPassword = HashPassword(request.Password);
             if (user.PasswordHash != hashedPassword)
             {
@@ -45,7 +46,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 };
             }
 
-            // ✅ Token oluştur
+            //  Token oluştur
             var token = _jwtTokenService.GenerateToken(user);
 
             return new ServiceResponse<LoginResponseDto>

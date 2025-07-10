@@ -1,6 +1,4 @@
 ﻿using RentACarProject.Domain.Common;
-using System;
-using System.Collections.Generic;
 
 namespace RentACarProject.Domain.Entities
 {
@@ -11,6 +9,7 @@ namespace RentACarProject.Domain.Entities
         public int Year { get; set; }
         public string Plate { get; set; } = null!;
         public decimal DailyPrice { get; set; }
+        public string? Description { get; set; }
         public bool Status { get; set; } = true;
 
         public Model Model { get; set; } = null!;

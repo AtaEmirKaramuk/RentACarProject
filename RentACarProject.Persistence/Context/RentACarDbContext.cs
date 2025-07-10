@@ -50,8 +50,6 @@ namespace RentACarProject.Persistence.Context
                 .Property(u => u.Email)
                 .HasMaxLength(100);
 
-            // Role enum int olarak saklanıyor, ekstra konfig gerekmez ✅
-
             // -------------------------- Customer --------------------------
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.User)
@@ -105,6 +103,10 @@ namespace RentACarProject.Persistence.Context
             modelBuilder.Entity<Car>()
                 .Property(c => c.DailyPrice)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Car>()
+                .Property(c => c.Description)
+                .HasMaxLength(500); // ✅ Opsiyonel: max 500 karakter sınırı
 
             modelBuilder.Entity<Car>()
                 .HasIndex(c => c.Plate)
