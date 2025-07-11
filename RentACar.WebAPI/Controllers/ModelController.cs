@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RentACarProject.Application.Features.Model.Commands;
 using RentACarProject.Application.Features.Model.Queries;
@@ -16,7 +17,7 @@ namespace RentACarProject.API.Controllers
             _mediator = mediator;
         }
 
-        //  Tüm modelleri listele
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,7 +25,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Model detay (Id'ye göre)
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -32,7 +33,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Model ekle
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateModelCommand command)
         {
@@ -40,7 +41,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Model güncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateModelCommand command)
         {
@@ -48,7 +49,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Model sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

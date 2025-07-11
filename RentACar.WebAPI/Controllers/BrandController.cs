@@ -17,7 +17,7 @@ namespace RentACarProject.API.Controllers
             _mediator = mediator;
         }
 
-        //  Tüm markaları listele
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -25,7 +25,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Id'ye göre marka getir
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -33,7 +33,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Marka oluştur
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateBrandCommand command)
         {
@@ -41,7 +41,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Marka güncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateBrandCommand command)
         {
@@ -49,7 +49,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
-        //  Marka sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

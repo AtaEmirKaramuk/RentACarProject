@@ -6,7 +6,6 @@ using RentACarProject.Application.Features.Car.Queries;
 
 namespace RentACarProject.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class CarController : ControllerBase
@@ -18,6 +17,7 @@ namespace RentACarProject.API.Controllers
             _mediator = mediator;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -25,6 +25,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -32,6 +33,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateCarCommand command)
         {
@@ -39,6 +41,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateCarCommand command)
         {
@@ -46,6 +49,7 @@ namespace RentACarProject.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
