@@ -18,7 +18,6 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
 
         public async Task<ServiceResponse<BrandResponseDto>> Handle(UpdateBrandCommand request, CancellationToken cancellationToken)
         {
-            // 🔎 Mevcut marka var mı?
             var brand = await _brandRepository.GetAsync(x => x.BrandId == request.Brand.BrandId);
             if (brand == null)
             {
@@ -30,7 +29,6 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
                 };
             }
 
-            // 🔎 Aynı isimde başka marka var mı kontrol
             var duplicateBrand = await _brandRepository.GetByNameAsync(request.Brand.Name);
             if (duplicateBrand != null && duplicateBrand.BrandId != request.Brand.BrandId)
             {
@@ -42,7 +40,6 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
                 };
             }
 
-            // 💡 Güncelleme
             brand.Name = request.Brand.Name;
 
             await _brandRepository.UpdateAsync(brand);
@@ -57,7 +54,7 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
             return new ServiceResponse<BrandResponseDto>
             {
                 Success = true,
-                Message = "Marka başarıyla güncellendi.",
+                Message = $"Marka \"{dto.Name}\" olarak güncellendi.",
                 Data = dto
             };
         }

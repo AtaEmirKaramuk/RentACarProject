@@ -23,6 +23,7 @@ namespace RentACarProject.Application.Features.Model.Queries.Handlers
                 {
                     ModelId = m.ModelId,
                     Name = m.Name,
+                    BrandId = m.BrandId,
                     BrandName = m.Brand.Name
                 })
                 .ToListAsync(cancellationToken);

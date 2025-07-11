@@ -1,29 +1,47 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
+using RentACarProject.Application.DTOs.Car;
 
 namespace RentACarProject.Application.Features.Car.Commands.Handlers
 {
-    public class UpdateCarCommandHandler : IRequestHandler<UpdateCarCommand, ServiceResponse<Guid>>
+    public class UpdateCarCommandHandler : IRequestHandler<UpdateCarCommand, ServiceResponse<CarResponseDto>>
     {
         private readonly ICarRepository _carRepository;
+        private readonly IModelRepository _modelRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateCarCommandHandler(ICarRepository carRepository, IUnitOfWork unitOfWork)
+        public UpdateCarCommandHandler(ICarRepository carRepository, IModelRepository modelRepository, IUnitOfWork unitOfWork)
         {
             _carRepository = carRepository;
+            _modelRepository = modelRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ServiceResponse<Guid>> Handle(UpdateCarCommand request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<CarResponseDto>> Handle(UpdateCarCommand request, CancellationToken cancellationToken)
         {
             var car = await _carRepository.GetAsync(c => c.CarId == request.CarId);
             if (car == null)
             {
-                return new ServiceResponse<Guid>
+                return new ServiceResponse<CarResponseDto>
                 {
                     Success = false,
                     Message = "Araç bulunamadı.",
+                    Code = "404"
+                };
+            }
+
+            var model = await _modelRepository.Query()
+                .Include(m => m.Brand)
+                .FirstOrDefaultAsync(m => m.ModelId == request.ModelId, cancellationToken);
+
+            if (model == null)
+            {
+                return new ServiceResponse<CarResponseDto>
+                {
+                    Success = false,
+                    Message = "Model bulunamadı.",
                     Code = "404"
                 };
             }
@@ -38,11 +56,23 @@ namespace RentACarProject.Application.Features.Car.Commands.Handlers
             await _carRepository.UpdateAsync(car);
             await _unitOfWork.SaveChangesAsync();
 
-            return new ServiceResponse<Guid>
+            var dto = new CarResponseDto
+            {
+                CarId = car.CarId,
+                BrandName = model.Brand.Name,
+                ModelName = model.Name,
+                Year = car.Year,
+                Plate = car.Plate,
+                DailyPrice = car.DailyPrice,
+                Description = car.Description,
+                Status = car.Status
+            };
+
+            return new ServiceResponse<CarResponseDto>
             {
                 Success = true,
-                Message = "Araç başarıyla güncellendi.",
-                Data = car.CarId
+                Message = $"Araç \"{dto.Plate}\" başarıyla güncellendi.",
+                Data = dto
             };
         }
     }

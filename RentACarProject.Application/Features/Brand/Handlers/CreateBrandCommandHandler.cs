@@ -2,7 +2,6 @@
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Brand;
-using RentACarProject.Domain.Entities;
 
 namespace RentACarProject.Application.Features.Brand.Commands.Handlers
 {
@@ -19,7 +18,6 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
 
         public async Task<ServiceResponse<BrandResponseDto>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
-            // Aynı isimde marka var mı kontrol
             var existingBrand = await _brandRepository.GetByNameAsync(request.Brand.Name);
             if (existingBrand != null)
             {
@@ -49,7 +47,7 @@ namespace RentACarProject.Application.Features.Brand.Commands.Handlers
             return new ServiceResponse<BrandResponseDto>
             {
                 Success = true,
-                Message = "Marka başarıyla oluşturuldu.",
+                Message = $"Marka \"{dto.Name}\" başarıyla oluşturuldu.",
                 Data = dto
             };
         }

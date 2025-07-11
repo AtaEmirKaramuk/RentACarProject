@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
+using RentACarProject.Application.DTOs.Model;
 
 namespace RentACarProject.Application.Features.Model.Commands.Handlers
 {
-    public class DeleteModelCommandHandler : IRequestHandler<DeleteModelCommand, ServiceResponse<Guid>>
+    public class DeleteModelCommandHandler : IRequestHandler<DeleteModelCommand, ServiceResponse<DeletedModelDto>>
     {
         private readonly IModelRepository _modelRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -15,12 +16,12 @@ namespace RentACarProject.Application.Features.Model.Commands.Handlers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ServiceResponse<Guid>> Handle(DeleteModelCommand request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<DeletedModelDto>> Handle(DeleteModelCommand request, CancellationToken cancellationToken)
         {
-            var model = await _modelRepository.GetAsync(x => x.ModelId == request.ModelId);
+            var model = await _modelRepository.GetAsync(m => m.ModelId == request.ModelId);
             if (model == null)
             {
-                return new ServiceResponse<Guid>
+                return new ServiceResponse<DeletedModelDto>
                 {
                     Success = false,
                     Message = "Model bulunamadı.",
@@ -31,11 +32,18 @@ namespace RentACarProject.Application.Features.Model.Commands.Handlers
             await _modelRepository.DeleteAsync(model);
             await _unitOfWork.SaveChangesAsync();
 
-            return new ServiceResponse<Guid>
+            var dto = new DeletedModelDto
+            {
+                ModelId = model.ModelId,
+                Name = model.Name,
+                BrandId = model.BrandId
+            };
+
+            return new ServiceResponse<DeletedModelDto>
             {
                 Success = true,
-                Message = "Model başarıyla silindi.",
-                Data = model.ModelId
+                Message = $"Model \"{dto.Name}\" başarıyla silindi.",
+                Data = dto
             };
         }
     }

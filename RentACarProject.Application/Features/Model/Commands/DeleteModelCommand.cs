@@ -1,12 +1,8 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using System.Diagnostics;
+using RentACarProject.Application.DTOs.Model;
 
-namespace RentACarProject.Application.Features.Model.Commands
+public class DeleteModelCommand : IRequest<ServiceResponse<DeletedModelDto>>
 {
-    public class DeleteModelCommand : IRequest<ServiceResponse<Guid>>
-    {
-        public Guid ModelId { get; set; }
-    }
+    public Guid ModelId { get; set; }
 }
-   

@@ -38,7 +38,7 @@ namespace RentACarProject.Application.Features.Brand.Handlers
             return new ServiceResponse<BrandResponseDto>
             {
                 Success = true,
-                Message = "Marka başarıyla getirildi.",
+                Message = $"Marka \"{dto.Name}\" başarıyla getirildi.",
                 Data = dto
             };
         }

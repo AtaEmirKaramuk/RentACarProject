@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
+using RentACarProject.Application.DTOs.Car;
 
 namespace RentACarProject.Application.Features.Car.Commands
 {
-    public class CreateCarCommand : IRequest<ServiceResponse<Guid>>
+    public class CreateCarCommand : IRequest<ServiceResponse<CarResponseDto>>
     {
         public Guid ModelId { get; set; }
         public int Year { get; set; }

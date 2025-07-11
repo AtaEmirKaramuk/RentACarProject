@@ -1,11 +1,9 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
+using RentACarProject.Application.DTOs.Model;
 
-namespace RentACarProject.Application.Features.Model.Commands
+public class CreateModelCommand : IRequest<ServiceResponse<ModelResponseDto>>
 {
-    public class CreateModelCommand : IRequest<ServiceResponse<Guid>>
-    {
-        public string Name { get; set; } = null!;
-        public Guid BrandId { get; set; }
-    }
+    public string Name { get; set; } = null!;
+    public Guid BrandId { get; set; }
 }

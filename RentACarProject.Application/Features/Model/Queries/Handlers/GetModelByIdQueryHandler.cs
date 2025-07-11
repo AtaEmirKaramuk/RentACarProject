@@ -24,6 +24,7 @@ namespace RentACarProject.Application.Features.Model.Queries.Handlers
                 {
                     ModelId = m.ModelId,
                     Name = m.Name,
+                    BrandId = m.BrandId,
                     BrandName = m.Brand.Name
                 })
                 .FirstOrDefaultAsync(cancellationToken);
@@ -41,7 +42,7 @@ namespace RentACarProject.Application.Features.Model.Queries.Handlers
             return new ServiceResponse<ModelResponseDto>
             {
                 Success = true,
-                Message = "Model başarıyla getirildi.",
+                Message = $"Model \"{model.Name}\" başarıyla getirildi.",
                 Data = model
             };
         }
