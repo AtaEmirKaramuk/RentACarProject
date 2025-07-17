@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Application.DTOs.Car;
+using RentACarProject.Domain.DTOs.Car;
 
 namespace RentACarProject.Application.Features.Car.Queries
 {

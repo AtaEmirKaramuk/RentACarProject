@@ -1,4 +1,6 @@
-﻿using RentACarProject.Domain.Entities;
+﻿using Microsoft.Extensions.Configuration;
+using RentACarProject.Domain.Entities;
+using RentACarProject.Domain.Enums;
 using RentACarProject.Persistence.Context;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,12 +9,21 @@ namespace RentACarProject.Persistence.Seed
 {
     public static class SeedData
     {
-        public static void SeedAdminUser(RentACarDbContext context)
+        public static void SeedAdminUser(RentACarDbContext context, IConfiguration configuration)
         {
-            // Eğer admin varsa tekrar ekleme
-            if (context.Users.Any(u => u.Role == Domain.Enums.UserRole.Admin))
-            {
+            if (context.Users.Any(u => u.Role == UserRole.Admin))
                 return;
+
+            // appsettings'den bilgileri al
+            var adminSection = configuration.GetSection("AdminUser");
+            var username = adminSection["UserName"];
+            var email = adminSection["Email"];
+            var password = adminSection["Password"];
+
+            // Null veya boş kontrolü
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                throw new Exception("Admin user credentials are not properly configured in appsettings.json!");
             }
 
             // Şifre hash
@@ -24,14 +35,13 @@ namespace RentACarProject.Persistence.Seed
                 return Convert.ToBase64String(hash);
             }
 
-
             var adminUser = new User
             {
                 UserId = Guid.NewGuid(),
-                UserName = "AtaEmirIronside",
-                Email = "admin@rentacar.com",
-                PasswordHash = HashPassword("Aaei092002!"), 
-                Role = Domain.Enums.UserRole.Admin
+                UserName = username,
+                Email = email,
+                PasswordHash = HashPassword(password),
+                Role = UserRole.Admin
             };
 
             context.Users.Add(adminUser);

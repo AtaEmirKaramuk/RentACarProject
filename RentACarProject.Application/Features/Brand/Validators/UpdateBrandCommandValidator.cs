@@ -5,7 +5,7 @@ public class UpdateBrandCommandValidator : AbstractValidator<UpdateBrandCommand>
 {
     public UpdateBrandCommandValidator()
     {
-        RuleFor(x => x.Brand.BrandId)
+        RuleFor(x => x.Brand.Id)
             .NotEmpty().WithMessage("BrandId zorunludur.")
             .Must(id => id != Guid.Empty).WithMessage("BrandId boş olamaz.");
 

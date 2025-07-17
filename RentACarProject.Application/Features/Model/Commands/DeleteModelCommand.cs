@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Application.DTOs.Model;
+using RentACarProject.Domain.DTOs.Model;
 
 public class DeleteModelCommand : IRequest<ServiceResponse<DeletedModelDto>>
 {

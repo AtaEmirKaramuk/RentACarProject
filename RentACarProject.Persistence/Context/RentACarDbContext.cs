@@ -167,6 +167,7 @@ namespace RentACarProject.Persistence.Context
             UpdateBaseEntityFields();
             return await base.SaveChangesAsync(cancellationToken);
         }
+        public DbSet<Log> Logs => Set<Log>();
 
         private void UpdateBaseEntityFields()
         {

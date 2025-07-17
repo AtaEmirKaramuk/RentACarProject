@@ -4,28 +4,60 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RentACarProject.API.Middlewares;
 using RentACarProject.Application.Abstraction.Repositories;
-using RentACarProject.Application.Abstraction.Services;
-using RentACarProject.Application.Features.Auth.Handlers;
+using RentACarProject.Application.Behaviors;
+using RentACarProject.Application.Features.Auth.Commands;
 using RentACarProject.Application.Services;
 using RentACarProject.Application.Validators.Auth;
-using RentACarProject.Infrastructure.Services;
 using RentACarProject.Persistence.Context;
 using RentACarProject.Persistence.Repositories;
 using RentACarProject.Persistence.Seed;
+//using Serilog;
+//using Serilog.Sinks.MSSqlServer;
 using System.Text;
+using RentACarProject.Application.Abstraction.Services;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+//// ✅ Serilog logger kurulumu
+//Log.Logger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .Enrich.FromLogContext()
+//    .WriteTo.Console()
+//    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+//    .WriteTo.MSSqlServer(
+//        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+//        sinkOptions: new MSSqlServerSinkOptions
+//        {
+//            TableName = "Logs",
+//            AutoCreateSqlTable = true
+//        })
+//    .CreateLogger();
+
+//builder.Host.UseSerilog();
+
+// Controllers ve Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-//  Swagger + JWT Authorization
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new() { Title = "RentACar API", Version = "v1" });
+    options.SwaggerDoc("Admin", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Admin API",
+        Version = "v1"
+    });
 
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    options.SwaggerDoc("Public", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Public API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = @"JWT Bearer token kullanımı için.  
                         Authorization: Bearer {token} şeklinde giriniz.",
@@ -35,7 +67,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
     {
         {
             new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -58,7 +90,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<RentACarDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//  Scoped servisler
+//  Repositories & services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<ICustomerRepository, EfCustomerRepository>();
@@ -68,16 +100,12 @@ builder.Services.AddScoped<IModelRepository, EfModelRepository>();
 builder.Services.AddScoped<IReservationRepository, EfReservationRepository>();
 builder.Services.AddScoped<IPaymentRepository, EfPaymentRepository>();
 
-//  JWT Key
+
+//  JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "DEFAULT_SECRET_KEY";
 var key = Encoding.ASCII.GetBytes(jwtKey);
 builder.Services.AddSingleton(new JwtTokenService(jwtKey));
 
-// CurrentUserService
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-//  Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -97,7 +125,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Authorization
 builder.Services.AddAuthorization();
 
 //  MediatR
@@ -106,27 +133,37 @@ builder.Services.AddMediatR(cfg =>
 
 //  FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
-builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
 
-//  Admin seed data
+//  Admin seed
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<RentACarDbContext>();
-    SeedData.SeedAdminUser(dbContext);
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    SeedData.SeedAdminUser(dbContext, configuration);
 }
 
+// Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/Admin/swagger.json", "Admin API");
+        options.SwaggerEndpoint("/swagger/Public/swagger.json", "Public API");
+    });
 }
+
+//  Middlewares
+// app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

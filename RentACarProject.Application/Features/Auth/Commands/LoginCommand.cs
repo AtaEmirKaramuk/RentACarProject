@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Application.DTOs.Auth;
+using RentACarProject.Domain.DTOs.Auth;
 
 namespace RentACarProject.Application.Features.Auth.Commands
 {
