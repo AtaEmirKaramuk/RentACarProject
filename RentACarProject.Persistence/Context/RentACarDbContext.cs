@@ -17,11 +17,13 @@ namespace RentACarProject.Persistence.Context
         // 🟢 DbSet'ler
         public DbSet<User> Users => Set<User>();
         public DbSet<Customer> Customers => Set<Customer>();
-        public DbSet<Car> Cars => Set<Car>();
+        public DbSet<Location> Locations => Set<Location>();
         public DbSet<Reservation> Reservations => Set<Reservation>();
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Brand> Brands => Set<Brand>();
         public DbSet<Model> Models => Set<Model>();
+        public DbSet<Log> Logs => Set<Log>();
+        public DbSet<Car> Cars => Set<Car>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -129,7 +131,7 @@ namespace RentACarProject.Persistence.Context
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.Customer)
                 .WithMany(c => c.Reservations)
-                .HasForeignKey(r => r.CustomerId)
+                .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // -------------------------- Payment --------------------------
@@ -146,6 +148,19 @@ namespace RentACarProject.Persistence.Context
                 .WithMany(r => r.Payments)
                 .HasForeignKey(p => p.ReservationId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // -------------------------- Location – Reservation --------------------------
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.PickupLocation)
+                .WithMany(l => l.PickupReservations)
+                .HasForeignKey(r => r.PickupLocationId)
+                .OnDelete(DeleteBehavior.NoAction); 
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.DropoffLocation)
+                .WithMany(l => l.DropoffReservations)
+                .HasForeignKey(r => r.DropoffLocationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
 
             base.OnModelCreating(modelBuilder);
         }
@@ -167,7 +182,7 @@ namespace RentACarProject.Persistence.Context
             UpdateBaseEntityFields();
             return await base.SaveChangesAsync(cancellationToken);
         }
-        public DbSet<Log> Logs => Set<Log>();
+        
 
         private void UpdateBaseEntityFields()
         {
