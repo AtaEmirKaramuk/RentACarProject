@@ -1,4 +1,5 @@
 ﻿using RentACarProject.Domain.Common;
+using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Domain.Entities
 {
@@ -10,7 +11,11 @@ namespace RentACarProject.Domain.Entities
         public string Plate { get; set; } = null!;
         public decimal DailyPrice { get; set; }
         public string? Description { get; set; }
-        public bool Status { get; set; } = true;
+
+        public CarStatus Status { get; set; } = CarStatus.Available;
+        public VehicleClass VehicleClass { get; set; } = VehicleClass.Sedan;
+        public FuelType FuelType { get; set; } = FuelType.Gasoline;
+        public TransmissionType TransmissionType { get; set; } = TransmissionType.Automatic;
 
         public Model Model { get; set; } = null!;
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

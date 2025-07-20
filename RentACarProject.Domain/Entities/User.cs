@@ -11,7 +11,7 @@ namespace RentACarProject.Domain.Entities
         public string PasswordHash { get; set; } = null!;
         public string? Email { get; set; }
 
-        // Enum olarak saklıyoruz, default User
+       
         public UserRole Role { get; set; } = UserRole.User;
 
         public Customer? Customer { get; set; }

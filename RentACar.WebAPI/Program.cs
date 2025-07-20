@@ -6,19 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RentACarProject.API.Middlewares;
 using RentACarProject.Application.Abstraction.Repositories;
+using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Behaviors;
 using RentACarProject.Application.Features.Auth.Commands;
 using RentACarProject.Application.Services;
 using RentACarProject.Application.Validators.Auth;
+using RentACarProject.Infrastructure.Services;
 using RentACarProject.Persistence.Context;
 using RentACarProject.Persistence.Repositories;
 using RentACarProject.Persistence.Seed;
 //using Serilog;
 //using Serilog.Sinks.MSSqlServer;
 using System.Text;
-using RentACarProject.Application.Abstraction.Services;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +99,9 @@ builder.Services.AddScoped<IModelRepository, EfModelRepository>();
 builder.Services.AddScoped<IReservationRepository, EfReservationRepository>();
 builder.Services.AddScoped<IPaymentRepository, EfPaymentRepository>();
 
+// ✅ Eksik servislerin DI kayıtları:
+builder.Services.AddScoped<ILocationRepository, EfLocationRepository>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 //  JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "DEFAULT_SECRET_KEY";
@@ -158,12 +160,11 @@ if (app.Environment.IsDevelopment())
 }
 
 //  Middlewares
-// app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

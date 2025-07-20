@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Car;
+using RentACarProject.Application.DTOs.Car;
 using RentACarProject.Application.Exceptions;
+using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Application.Features.Car.Commands
 {
@@ -27,9 +28,12 @@ namespace RentACarProject.Application.Features.Car.Commands
                 .FirstOrDefaultAsync(m => m.ModelId == request.ModelId, cancellationToken);
 
             if (model == null)
-            {
                 throw new BusinessException("Model bulunamadı.");
-            }
+
+            // ✅ Plaka eşsizliği kontrolü
+            var existingCarWithPlate = await _carRepository.GetAsync(c => c.Plate.ToLower() == request.Plate.ToLower());
+            if (existingCarWithPlate != null)
+                throw new BusinessException($"\"{request.Plate}\" plakalı araç zaten mevcut.");
 
             var newCar = new Domain.Entities.Car
             {
@@ -39,7 +43,10 @@ namespace RentACarProject.Application.Features.Car.Commands
                 Plate = request.Plate,
                 DailyPrice = request.DailyPrice,
                 Description = request.Description,
-                Status = true
+                Status = CarStatus.Available,
+                VehicleClass = request.VehicleClass,
+                FuelType = request.FuelType,
+                TransmissionType = request.TransmissionType
             };
 
             await _carRepository.AddAsync(newCar);
@@ -54,7 +61,10 @@ namespace RentACarProject.Application.Features.Car.Commands
                 Plate = newCar.Plate,
                 DailyPrice = newCar.DailyPrice,
                 Description = newCar.Description,
-                Status = newCar.Status
+                Status = newCar.Status,
+                VehicleClass = newCar.VehicleClass,
+                FuelType = newCar.FuelType,
+                TransmissionType = newCar.TransmissionType
             };
 
             return new ServiceResponse<CarResponseDto>

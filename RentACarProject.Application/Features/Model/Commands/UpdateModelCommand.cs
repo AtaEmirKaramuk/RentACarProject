@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Model;
+using RentACarProject.Application.DTOs.Model;
 
 public class UpdateModelCommand : IRequest<ServiceResponse<ModelResponseDto>>
 {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Auth;
+using RentACarProject.Application.DTOs.Auth;
 using RentACarProject.Application.Exceptions;
 using RentACarProject.Domain.Entities;
 using RentACarProject.Domain.Enums;

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using RentACarProject.Application.Features.Car.Commands;
+using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Application.Features.Car.Validators
 {
@@ -22,7 +23,14 @@ namespace RentACarProject.Application.Features.Car.Validators
                 .GreaterThan(0).WithMessage("Günlük fiyat 0'dan büyük olmalıdır.")
                 .LessThan(50000).WithMessage("Günlük fiyat makul bir değerden yüksek olamaz.");
 
-            // opsiyonel: açıklama boş olabilir, o yüzden validator zorunlu değil
+            RuleFor(x => x.VehicleClass)
+                .IsInEnum().WithMessage("Geçersiz araç sınıfı seçildi.");
+
+            RuleFor(x => x.FuelType)
+                .IsInEnum().WithMessage("Geçersiz yakıt tipi seçildi.");
+
+            RuleFor(x => x.TransmissionType)
+                .IsInEnum().WithMessage("Geçersiz vites tipi seçildi.");
         }
     }
 }

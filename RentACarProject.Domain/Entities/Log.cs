@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RentACarProject.Domain.Common;
+using System;
 
 namespace RentACarProject.Domain.Entities
 {

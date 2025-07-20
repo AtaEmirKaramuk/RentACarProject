@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Car;
+using RentACarProject.Application.DTOs.Car;
 
 namespace RentACarProject.Application.Features.Car.Queries
 {
@@ -41,7 +41,10 @@ namespace RentACarProject.Application.Features.Car.Queries
                 Plate = car.Plate,
                 DailyPrice = car.DailyPrice,
                 Description = car.Description,
-                Status = car.Status
+                Status = car.Status,
+                VehicleClass = car.VehicleClass,
+                FuelType = car.FuelType,
+                TransmissionType = car.TransmissionType
             };
 
             return new ServiceResponse<CarResponseDto>

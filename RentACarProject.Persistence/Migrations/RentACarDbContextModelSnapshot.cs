@@ -122,6 +122,11 @@ namespace RentACarProject.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("FuelType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -139,8 +144,20 @@ namespace RentACarProject.Persistence.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TransmissionType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VehicleClass")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -152,10 +169,7 @@ namespace RentACarProject.Persistence.Migrations
                     b.HasIndex("Plate")
                         .IsUnique();
 
-                    b.ToTable("Cars", t =>
-                        {
-                            t.HasCheckConstraint("CHK_Cars_Status", "[Status] IN (1, 0)");
-                        });
+                    b.ToTable("Cars");
                 });
 
             modelBuilder.Entity("RentACarProject.Domain.Entities.Customer", b =>
@@ -379,6 +393,9 @@ namespace RentACarProject.Persistence.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");

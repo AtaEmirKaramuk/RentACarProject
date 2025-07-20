@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RentACarProject.Application.Features.Car.Commands;
 using RentACarProject.Application.Features.Car.Queries;
 using RentACarProject.Application.Common;
+using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.WebAPI.Controllers.Admin
 {
@@ -21,30 +22,8 @@ namespace RentACarProject.WebAPI.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] Guid? brandId,
-            [FromQuery] Guid? modelId,
-            [FromQuery] string? brandName,
-            [FromQuery] string? modelName,
-            [FromQuery] int? minYear,
-            [FromQuery] int? maxYear,
-            [FromQuery] decimal? minPrice,
-            [FromQuery] decimal? maxPrice,
-            [FromQuery] bool? status)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCarsQuery query)
         {
-            var query = new GetAllCarsQuery
-            {
-                BrandId = brandId,
-                ModelId = modelId,
-                BrandName = brandName,
-                ModelName = modelName,
-                MinYear = minYear,
-                MaxYear = maxYear,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                Status = status
-            };
-
             var result = await _mediator.Send(query);
             return this.ToActionResult(result);
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Domain.Entities;
+using RentACarProject.Domain.Enums; // ✅ Enum ekle
 using RentACarProject.Persistence.Context;
 
 namespace RentACarProject.Persistence.Repositories
@@ -14,7 +15,7 @@ namespace RentACarProject.Persistence.Repositories
         public async Task<List<Car>> GetAvailableCarsAsync()
         {
             return await _context.Cars
-                .Where(c => c.Status == true)
+                .Where(c => c.Status == CarStatus.Available) // ✅ Enum ile filtre
                 .ToListAsync();
         }
 

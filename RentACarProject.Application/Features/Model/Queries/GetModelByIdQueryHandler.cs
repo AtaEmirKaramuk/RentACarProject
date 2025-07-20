@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Model;
+using RentACarProject.Application.DTOs.Model;
 
 namespace RentACarProject.Application.Features.Model.Queries
 {

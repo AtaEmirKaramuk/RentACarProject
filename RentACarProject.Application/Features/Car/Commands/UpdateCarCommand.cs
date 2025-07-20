@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Car;
+using RentACarProject.Application.DTOs.Car;
+using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Application.Features.Car.Commands
 {
@@ -12,6 +13,10 @@ namespace RentACarProject.Application.Features.Car.Commands
         public string Plate { get; set; } = null!;
         public decimal DailyPrice { get; set; }
         public string? Description { get; set; }
-        public bool Status { get; set; }
+        public CarStatus Status { get; set; }
+
+        public VehicleClass VehicleClass { get; set; }
+        public FuelType FuelType { get; set; }
+        public TransmissionType TransmissionType { get; set; }
     }
 }

@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RentACarProject.Application\RentACarProject.Application.csproj" />
     <ProjectReference Include="..\RentACarProject.Domain\RentACarProject.Domain.csproj" />
   </ItemGroup>
 

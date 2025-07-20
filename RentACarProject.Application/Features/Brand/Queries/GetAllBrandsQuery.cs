@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Brand;
+using RentACarProject.Application.DTOs.Brand;
 
 namespace RentACarProject.Application.Features.Brand.Queries
 {

@@ -15,7 +15,7 @@ namespace RentACarProject.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal TotalPrice { get; set; }
-        ReservationStatus Status { get; set; } = ReservationStatus.Active;
+        public ReservationStatus Status { get; set; } = ReservationStatus.Active;
 
         public Car Car { get; set; } = null!;
         public Customer Customer { get; set; } = null!;

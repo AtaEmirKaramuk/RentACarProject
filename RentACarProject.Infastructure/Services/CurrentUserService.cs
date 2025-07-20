@@ -1,29 +1,37 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using System.Security.Claims;
-//using RentACarProject.Application.Abstraction.Services;
+﻿using Microsoft.AspNetCore.Http;
+using RentACarProject.Application.Abstraction.Services;
+using System.Security.Claims;
 
-//namespace RentACarProject.Infrastructure.Services
-//{
-//    public class CurrentUserService : ICurrentUserService
-//    {
-//        public Guid? UserId { get; }
-//        public string? UserName { get; }
-//        public string? Email { get; }
-//        public string? Role { get; }
-//        public bool IsAuthenticated { get; }
+namespace RentACarProject.Infrastructure.Services
+{
+    public class CurrentUserService : ICurrentUserService
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-//        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
-//        {
-//            var user = httpContextAccessor.HttpContext?.User;
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-//            if (user != null && user.Identity != null && user.Identity.IsAuthenticated)
-//            {
-//                IsAuthenticated = true;
-//                UserId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString());
-//                UserName = user.FindFirstValue(ClaimTypes.Name);
-//                Email = user.FindFirstValue(ClaimTypes.Email);
-//                Role = user.FindFirstValue(ClaimTypes.Role);
-//            }
-//        }
-//    }
-//}
+        public Guid? UserId
+        {
+            get
+            {
+                var value = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                return Guid.TryParse(value, out var id) ? id : null;
+            }
+        }
+
+        public string? UserName =>
+            _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+
+        public string? Email =>
+            _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+
+        public string? Role =>
+            _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+
+        public bool IsAuthenticated =>
+            _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+    }
+}

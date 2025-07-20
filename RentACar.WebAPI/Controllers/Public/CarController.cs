@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RentACarProject.Application.Features.Car.Queries;
 using RentACarProject.Application.Common;
+using RentACarProject.Application.Features.Car.Queries;
 
 namespace RentACarProject.WebAPI.Controllers.Public
 {
@@ -20,26 +20,8 @@ namespace RentACarProject.WebAPI.Controllers.Public
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] string? brandName,
-            [FromQuery] string? modelName,
-            [FromQuery] int? minYear,
-            [FromQuery] int? maxYear,
-            [FromQuery] decimal? minPrice,
-            [FromQuery] decimal? maxPrice,
-            [FromQuery] bool? status)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCarsQuery query)
         {
-            var query = new GetAllCarsQuery
-            {
-                BrandName = brandName,
-                ModelName = modelName,
-                MinYear = minYear,
-                MaxYear = maxYear,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                Status = status
-            };
-
             var result = await _mediator.Send(query);
             return this.ToActionResult(result);
         }
@@ -53,7 +35,7 @@ namespace RentACarProject.WebAPI.Controllers.Public
         }
 
         [AllowAnonymous]
-        [HttpGet("bymodel/{modelName}")]
+        [HttpGet("by-model/{modelName}")]
         public async Task<IActionResult> GetByModel(string modelName)
         {
             var result = await _mediator.Send(new GetCarsByModelQuery { ModelName = modelName });

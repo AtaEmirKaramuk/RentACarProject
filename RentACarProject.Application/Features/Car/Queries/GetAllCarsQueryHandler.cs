@@ -2,7 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Car;
+using RentACarProject.Application.DTOs.Car;
+using RentACarProject.Application.Features.Car.Queries;
 
 namespace RentACarProject.Application.Features.Car.Queries
 {
@@ -49,6 +50,16 @@ namespace RentACarProject.Application.Features.Car.Queries
             if (request.Status.HasValue)
                 carsQuery = carsQuery.Where(c => c.Status == request.Status.Value);
 
+            // ✅ Yeni filtreler
+            if (request.VehicleClass.HasValue)
+                carsQuery = carsQuery.Where(c => c.VehicleClass == request.VehicleClass.Value);
+
+            if (request.FuelType.HasValue)
+                carsQuery = carsQuery.Where(c => c.FuelType == request.FuelType.Value);
+
+            if (request.TransmissionType.HasValue)
+                carsQuery = carsQuery.Where(c => c.TransmissionType == request.TransmissionType.Value);
+
             var cars = await carsQuery.ToListAsync(cancellationToken);
 
             var result = cars.Select(c => new CarResponseDto
@@ -60,7 +71,10 @@ namespace RentACarProject.Application.Features.Car.Queries
                 Plate = c.Plate,
                 DailyPrice = c.DailyPrice,
                 Description = c.Description,
-                Status = c.Status
+                Status = c.Status,
+                VehicleClass = c.VehicleClass,
+                FuelType = c.FuelType,
+                TransmissionType = c.TransmissionType
             }).ToList();
 
             return new ServiceResponse<List<CarResponseDto>>

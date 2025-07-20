@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using RentACarProject.Application.Common;
 
 namespace RentACarProject.Application.Behaviors
 {
@@ -23,7 +24,19 @@ namespace RentACarProject.Application.Behaviors
                 var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
 
                 if (failures.Count != 0)
-                    throw new ValidationException(failures);
+                {
+                    var message = string.Join(" | ", failures.Select(e => e.ErrorMessage));
+
+                    // ServiceResponse<T> türünde bir response oluştur
+                    var responseType = typeof(TResponse);
+                    var serviceResponse = Activator.CreateInstance(responseType);
+
+                    serviceResponse!.GetType().GetProperty("Success")?.SetValue(serviceResponse, false);
+                    serviceResponse.GetType().GetProperty("Message")?.SetValue(serviceResponse, message);
+                    serviceResponse.GetType().GetProperty("Code")?.SetValue(serviceResponse, "VALIDATION_ERROR");
+
+                    return (TResponse)serviceResponse!;
+                }
             }
 
             return await next();

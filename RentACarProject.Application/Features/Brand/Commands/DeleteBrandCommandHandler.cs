@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Common;
-using RentACarProject.Domain.DTOs.Brand;
+using RentACarProject.Application.DTOs.Brand;
 using RentACarProject.Application.Exceptions;
 
 namespace RentACarProject.Application.Features.Brand.Commands
