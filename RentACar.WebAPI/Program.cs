@@ -1,8 +1,12 @@
-﻿using FluentValidation;
+﻿using Abstraction.Services;
+using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Email;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using RentACarProject.API.Middlewares;
 using RentACarProject.Application.Abstraction.Repositories;
@@ -15,30 +19,11 @@ using RentACarProject.Infrastructure.Services;
 using RentACarProject.Persistence.Context;
 using RentACarProject.Persistence.Repositories;
 using RentACarProject.Persistence.Seed;
-//using Serilog;
-//using Serilog.Sinks.MSSqlServer;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//// ✅ Serilog logger kurulumu
-//Log.Logger = new LoggerConfiguration()
-//    .ReadFrom.Configuration(builder.Configuration)
-//    .Enrich.FromLogContext()
-//    .WriteTo.Console()
-//    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
-//    .WriteTo.MSSqlServer(
-//        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-//        sinkOptions: new MSSqlServerSinkOptions
-//        {
-//            TableName = "Logs",
-//            AutoCreateSqlTable = true
-//        })
-//    .CreateLogger();
-
-//builder.Host.UseSerilog();
-
-// Controllers ve Swagger
+// Swagger + Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -85,11 +70,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-//  DbContext
+// DbContext
 builder.Services.AddDbContext<RentACarDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//  Repositories & services
+// Repositories & Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<ICustomerRepository, EfCustomerRepository>();
@@ -98,12 +83,19 @@ builder.Services.AddScoped<IBrandRepository, EfBrandRepository>();
 builder.Services.AddScoped<IModelRepository, EfModelRepository>();
 builder.Services.AddScoped<IReservationRepository, EfReservationRepository>();
 builder.Services.AddScoped<IPaymentRepository, EfPaymentRepository>();
-
-// ✅ Eksik servislerin DI kayıtları:
 builder.Services.AddScoped<ILocationRepository, EfLocationRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-//  JWT
+// Şifre doğrulama ve cache servisi (PasswordChange için gerekli)
+builder.Services.AddMemoryCache();
+
+// SMTP Mail
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
+builder.Services.AddHttpContextAccessor();
+
+// JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "DEFAULT_SECRET_KEY";
 var key = Encoding.ASCII.GetBytes(jwtKey);
 builder.Services.AddSingleton(new JwtTokenService(jwtKey));
@@ -129,18 +121,18 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-//  MediatR
+// MediatR
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(RegisterCommandHandler).Assembly));
 
-//  FluentValidation
+// FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
 
-//  Admin seed
+// Admin seed işlemi
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<RentACarDbContext>();
@@ -159,7 +151,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-//  Middlewares
+// Middlewares
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();

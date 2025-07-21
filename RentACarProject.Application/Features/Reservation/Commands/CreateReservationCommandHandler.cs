@@ -61,7 +61,7 @@ namespace RentACarProject.Application.Features.Reservation.Commands
 
             var reservation = new ReservationEntity
             {
-                ReservationId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 CarId = dto.CarId,
                 UserId = _currentUserService.UserId.Value,
                 PickupLocationId = dto.PickupLocationId,
@@ -77,7 +77,7 @@ namespace RentACarProject.Application.Features.Reservation.Commands
 
             var responseDto = new ReservationResponseDto
             {
-                Id = reservation.ReservationId,
+                Id = reservation.Id,
                 CarPlate = car.Plate,
                 CarModel = car.Model.Name,
                 CarBrand = car.Model.Brand.Name,

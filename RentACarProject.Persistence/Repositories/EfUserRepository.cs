@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Domain.Entities;
-using RentACarProject.Domain.Enums; // ✅ Eklenmesi lazım
+using RentACarProject.Domain.Enums;
 using RentACarProject.Persistence.Context;
+using System.Linq.Expressions;
 
 namespace RentACarProject.Persistence.Repositories
 {
@@ -40,5 +41,20 @@ namespace RentACarProject.Persistence.Repositories
                 .Include(u => u.Customer)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
+
+        public async Task<User?> GetByIdAsync(Guid userId)
+        {
+            return await _context.Users
+                .Where(x => !x.IsDeleted && x.UserId == userId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users
+                .Where(x => !x.IsDeleted)
+                .AnyAsync(predicate);
+        }
+
     }
 }

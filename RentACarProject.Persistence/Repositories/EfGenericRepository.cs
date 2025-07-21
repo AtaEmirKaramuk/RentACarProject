@@ -63,5 +63,10 @@ namespace RentACarProject.Persistence.Repositories
         {
             return _dbSet.Where(e => !e.IsDeleted).AsQueryable();
         }
+
+        public IQueryable<TEntity> GetAll()
+        {
+            return Query(); // Alternatif olarak doğrudan: return _dbSet.Where(e => !e.IsDeleted);
+        }
     }
 }

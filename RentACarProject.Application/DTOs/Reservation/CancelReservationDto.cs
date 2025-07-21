@@ -2,6 +2,6 @@
 {
     public class CancelReservationDto
     {
-        public Guid ReservationId { get; set; }
+        public Guid Id { get; set; }
     }
 }

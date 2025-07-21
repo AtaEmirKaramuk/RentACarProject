@@ -55,10 +55,16 @@ namespace RentACarProject.API.Middlewares
                         code = "UNAUTHORIZED";
                         break;
 
-                    case ForbiddenAccessException:
+                    case ForbiddenAccessException forbiddenAccessEx:
                         statusCode = (int)HttpStatusCode.Forbidden;
                         message = "Bu kaynağa erişim izniniz yok.";
                         code = "FORBIDDEN";
+                        break;
+
+                    case NotFoundException notFoundEx:
+                        statusCode = (int)HttpStatusCode.NotFound;
+                        message = notFoundEx.Message;
+                        code = "NOT_FOUND";
                         break;
                 }
 

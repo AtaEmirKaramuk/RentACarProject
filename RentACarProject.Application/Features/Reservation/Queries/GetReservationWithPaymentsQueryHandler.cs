@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RentACarProject.Application.Features.Reservation.Validators
+namespace RentACarProject.Application.Features.Reservation.Queries
 {
-    internal class Class1
+    internal class GetReservationWithPaymentsQueryHandler
     {
     }
 }

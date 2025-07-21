@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using RentACarProject.Application.Common;
+using System;
 
 namespace RentACarProject.Application.Features.Reservation.Commands
 {
-    internal class CancelReservationCommand
+    public class CancelReservationCommand : IRequest<ServiceResponse<string>>
     {
+        public Guid Id { get; set; }
     }
 }

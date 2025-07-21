@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
+using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Auth;
 using RentACarProject.Application.Exceptions;

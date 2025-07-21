@@ -2,7 +2,7 @@
 {
     public class UpdateReservationDto
     {
-        public Guid ReservationId { get; set; }
+        public Guid Id { get; set; }
         public Guid CarId { get; set; }
         public Guid PickupLocationId { get; set; }
         public Guid DropoffLocationId { get; set; }

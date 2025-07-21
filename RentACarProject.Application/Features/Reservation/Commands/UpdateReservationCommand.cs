@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using RentACarProject.Application.Common;
+using RentACarProject.Application.DTOs.Reservation;
 
 namespace RentACarProject.Application.Features.Reservation.Commands
 {
-    internal class UpdateReservationCommand
+    public class UpdateReservationCommand : IRequest<ServiceResponse<ReservationResponseDto>>
     {
+        public UpdateReservationDto Reservation { get; set; } = null!;
     }
 }

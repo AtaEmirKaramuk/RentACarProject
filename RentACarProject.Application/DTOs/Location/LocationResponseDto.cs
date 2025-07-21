@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RentACarProject.Application.Features.Reservation.Queries
+namespace RentACarProject.Application.DTOs.Location
 {
-    internal class GetReservationsByCustomerIdQuery
+    internal class LocationResponseDto
     {
     }
 }

@@ -11,10 +11,14 @@ namespace RentACarProject.Persistence.Repositories
         {
         }
 
-        // Eğer ekstra metot varsa buraya eklenir
         public async Task<List<Location>> GetAllLocationsAsync()
         {
             return await Query().ToListAsync();
+        }
+
+        public async Task<Location?> GetLocationByIdAsync(Guid locationId)
+        {
+            return await Query().FirstOrDefaultAsync(l => l.LocationId == locationId);
         }
     }
 }

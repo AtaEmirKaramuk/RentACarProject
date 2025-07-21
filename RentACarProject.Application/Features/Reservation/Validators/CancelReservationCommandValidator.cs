@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
+using RentACarProject.Application.Features.Reservation.Commands;
 
-namespace RentACarProject.Application.Features.Reservation.Validators
+namespace RentACarProject.Application.Validators.Reservation
 {
-    internal class CancelReservationCommandValidator
+    public class CancelReservationCommandValidator : AbstractValidator<CancelReservationCommand>
     {
+        public CancelReservationCommandValidator()
+        {
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("Rezervasyon ID boş olamaz.");
+        }
     }
 }

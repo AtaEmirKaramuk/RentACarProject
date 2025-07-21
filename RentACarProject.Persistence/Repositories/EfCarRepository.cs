@@ -15,7 +15,7 @@ namespace RentACarProject.Persistence.Repositories
         public async Task<List<Car>> GetAvailableCarsAsync()
         {
             return await _context.Cars
-                .Where(c => c.Status == CarStatus.Available) // ✅ Enum ile filtre
+                .Where(c => c.Status == CarStatus.Available) 
                 .ToListAsync();
         }
 

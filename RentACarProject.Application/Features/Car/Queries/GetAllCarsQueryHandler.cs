@@ -50,7 +50,6 @@ namespace RentACarProject.Application.Features.Car.Queries
             if (request.Status.HasValue)
                 carsQuery = carsQuery.Where(c => c.Status == request.Status.Value);
 
-            // ✅ Yeni filtreler
             if (request.VehicleClass.HasValue)
                 carsQuery = carsQuery.Where(c => c.VehicleClass == request.VehicleClass.Value);
 
