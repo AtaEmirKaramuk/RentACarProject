@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
 namespace RentACarProject.Application.Features.Location.Commands
 {
-    internal class DeleteLocationCommand
+    public class DeleteLocationCommand : IRequest<bool>
     {
+        public Guid LocationId { get; set; }
+
+        public DeleteLocationCommand(Guid locationId)
+        {
+            LocationId = locationId;
+        }
     }
 }

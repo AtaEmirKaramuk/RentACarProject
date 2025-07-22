@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using RentACarProject.Application.DTOs.Location;
 
 namespace RentACarProject.Application.Features.Location.Commands
 {
-    internal class UpdateLocationCommand
+    public class UpdateLocationCommand : IRequest<LocationResponseDto>
     {
+        public UpdateLocationDto Location { get; set; }
+
+        public UpdateLocationCommand(UpdateLocationDto location)
+        {
+            Location = location;
+        }
     }
 }

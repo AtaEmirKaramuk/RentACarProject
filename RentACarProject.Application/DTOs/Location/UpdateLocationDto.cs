@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RentACarProject.Application.DTOs.Location
+﻿namespace RentACarProject.Application.DTOs.Location
 {
-    internal class UpdateLocationDto
+    public class UpdateLocationDto
     {
+        public Guid LocationId { get; set; }  // ID zorunlu
+        public string Name { get; set; } = null!;
+        public string City { get; set; } = null!;
+        public string Address { get; set; } = null!;
+        public string? Description { get; set; }
     }
 }

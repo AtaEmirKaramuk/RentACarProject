@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using RentACarProject.Application.DTOs.Location;
 
 namespace RentACarProject.Application.Features.Location.Queries
 {
-    internal class GetAllLocationsQuery
+    public class GetAllLocationsQuery : IRequest<List<LocationResponseDto>>
     {
     }
 }

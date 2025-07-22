@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using RentACarProject.Application.DTOs.Location;
 
 namespace RentACarProject.Application.Features.Location.Queries
 {
-    internal class GetLocationByIdQuery
+    public class GetLocationByIdQuery : IRequest<LocationResponseDto>
     {
+        public Guid LocationId { get; set; }
+
+        public GetLocationByIdQuery(Guid locationId)
+        {
+            LocationId = locationId;
+        }
     }
 }
