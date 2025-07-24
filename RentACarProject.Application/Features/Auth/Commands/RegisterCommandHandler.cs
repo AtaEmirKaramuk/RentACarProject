@@ -96,7 +96,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
             catch (Exception)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                throw; // ExceptionMiddleware yakalar, 500 döner
+                throw; // ExceptionMiddleware yakalar
             }
         }
 

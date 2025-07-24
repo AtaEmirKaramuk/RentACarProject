@@ -110,9 +110,31 @@ namespace RentACarProject.Persistence.Context
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Payment
+            // Payment (Yeni versiyon)
             modelBuilder.Entity<Payment>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Payment>().Property(p => p.PaymentType).HasMaxLength(20);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Type)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.TransactionId)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.SenderIban)
+                .HasMaxLength(34);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.SenderName)
+                .HasMaxLength(100);
+
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Reservation)
                 .WithMany(r => r.Payments)

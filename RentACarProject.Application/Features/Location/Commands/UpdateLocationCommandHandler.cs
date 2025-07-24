@@ -35,7 +35,7 @@ namespace RentACarProject.Application.Features.Location.Commands
             location.Description = dto.Description;
 
             await _locationRepository.UpdateAsync(location);
-            await _unitOfWork.SaveChangesAsync(); // 🔥 Eksik olan kısım
+            await _unitOfWork.SaveChangesAsync(); 
 
             return new LocationResponseDto
             {

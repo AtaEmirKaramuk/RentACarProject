@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Payment\" />
+    <Folder Include="Features\Payment\Validators\" />
   </ItemGroup>
 
 </Project>

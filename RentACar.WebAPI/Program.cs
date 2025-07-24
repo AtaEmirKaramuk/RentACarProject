@@ -15,7 +15,9 @@ using RentACarProject.Application.Behaviors;
 using RentACarProject.Application.Features.Auth.Commands;
 using RentACarProject.Application.Services;
 using RentACarProject.Application.Validators.Auth;
+using RentACarProject.Infrastructure.Configurations;
 using RentACarProject.Infrastructure.Services;
+using RentACarProject.Infrastructure.Services.Payments;
 using RentACarProject.Persistence.Context;
 using RentACarProject.Persistence.Repositories;
 using RentACarProject.Persistence.Seed;
@@ -138,7 +140,25 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<RentACarDbContext>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     SeedData.SeedAdminUser(dbContext, configuration);
+
 }
+
+
+
+
+//builder.Services.AddHttpClient("iyzico", client =>
+//{
+//    client.BaseAddress = new Uri("https://api.iyzico.com"); // Gerçek URL'yi buraya yaz
+//    client.DefaultRequestHeaders.Add("Authorization", "Bearer {your_api_key}"); // Gerekliyse
+//    client.DefaultRequestHeaders.Add("Accept", "application/json");
+//});
+
+
+//builder.Services.AddScoped<IPaymentStrategyService, BankTransferPaymentService>(); // sadece örnek, factory üzerinden çözülür
+////builder.Services.AddScoped<BankTransferPaymentService>();
+//builder.Services.AddScoped<IyzicoPaymentService>();
+//builder.Services.AddScoped<IPaymentStrategyFactory, PaymentStrategyFactory>();
+
 
 // Swagger UI
 if (app.Environment.IsDevelopment())

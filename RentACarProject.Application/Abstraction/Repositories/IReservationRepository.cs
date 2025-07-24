@@ -24,5 +24,6 @@ namespace RentACarProject.Application.Abstraction.Repositories
 
         // Bir rezervasyonu tüm ilişkili verileriyle birlikte döner (Car → Model → Brand, Pickup/DropoffLocation).
         Task<Reservation?> GetByIdWithDetailsAsync(Guid id);
+        Task<Reservation?> GetReservationByIdAsync(Guid id);
     }
 }

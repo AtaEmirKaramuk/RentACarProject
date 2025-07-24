@@ -75,6 +75,12 @@ namespace RentACarProject.Persistence.Repositories
                 .FirstOrDefaultAsync(r => r.Id == reservationId);
         }
 
+
+        public async Task<Reservation?> GetReservationByIdAsync(Guid id)
+        {
+            return await Query().FirstOrDefaultAsync(r => r.Id == id);
+        }
+
         // Bir rezervasyonu tüm ilişkili verileriyle (Car, Model, Brand, Locations) birlikte getirir.
         public async Task<Reservation?> GetByIdWithDetailsAsync(Guid id)
         {
