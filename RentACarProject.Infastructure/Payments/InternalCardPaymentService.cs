@@ -1,71 +1,44 @@
-﻿using Microsoft.Extensions.Options;
-using RentACarProject.Application.Abstraction.Repositories;
+﻿using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
-using RentACarProject.Infrastructure.Configurations;
 using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Application.Exceptions;
 using RentACarProject.Domain.Entities;
 using RentACarProject.Domain.Enums;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 
 namespace RentACarProject.Infrastructure.Services.Payments
 {
-    public class IyzicoPaymentService : IPaymentStrategyService
+    public class InternalCardPaymentService : IPaymentStrategyService<CreateCardPaymentDto>
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
-        private readonly HttpClient _httpClient;
-        private readonly IyzicoSettings _iyzicoSettings;
 
-        public IyzicoPaymentService(
+        public InternalCardPaymentService(
             IPaymentRepository paymentRepository,
             IReservationRepository reservationRepository,
             IUnitOfWork unitOfWork,
-            ICurrentUserService currentUserService,
-            IHttpClientFactory httpClientFactory,
-            IOptions<IyzicoSettings> iyzicoOptions)
+            ICurrentUserService currentUserService)
         {
             _paymentRepository = paymentRepository;
             _reservationRepository = reservationRepository;
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
-            _httpClient = httpClientFactory.CreateClient("iyzico");
-            _iyzicoSettings = iyzicoOptions.Value;
-
-            // Base URL set ediliyorsa burada yapılabilir
-            _httpClient.BaseAddress = new Uri(_iyzicoSettings.BaseUrl);
         }
 
-        public async Task<PaymentResponseDto> ProcessPaymentAsync(CreatePaymentDto dto)
+        public async Task<PaymentResponseDto> ProcessPaymentAsync(CreateCardPaymentDto dto)
         {
             var reservation = await _reservationRepository.GetReservationByIdAsync(dto.ReservationId);
             if (reservation == null || reservation.IsDeleted)
                 throw new NotFoundException("Rezervasyon bulunamadı.");
 
-            var iyzicoRequest = new
-            {
-                price = dto.Amount,
-                currency = "TRY",
-                cardHolderName = dto.CardHolderName,
-                cardNumber = dto.CardNumber,
-                expireMonth = dto.ExpireMonth,
-                expireYear = dto.ExpireYear,
-                cvc = dto.Cvc,
-                externalId = Guid.NewGuid().ToString(),
-                apiKey = _iyzicoSettings.ApiKey,
-                secretKey = _iyzicoSettings.SecretKey
-            };
+            var isValid = !string.IsNullOrWhiteSpace(dto.CardHolderName)
+                       && !string.IsNullOrWhiteSpace(dto.CardNumber)
+                       && dto.ExpireMonth > 0
+                       && dto.ExpireYear > 0
+                       && !string.IsNullOrWhiteSpace(dto.Cvc);
 
-            var content = new StringContent(JsonSerializer.Serialize(iyzicoRequest), Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync("/api/payments", content);
-            var resultContent = await response.Content.ReadAsStringAsync();
-
-            var isSuccess = response.IsSuccessStatusCode;
+            var transactionId = $"CARD-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString()[..6]}";
 
             var payment = new Payment
             {
@@ -74,10 +47,16 @@ namespace RentACarProject.Infrastructure.Services.Payments
                 Amount = dto.Amount,
                 PaymentDate = DateTime.UtcNow,
                 Type = PaymentType.CreditCard,
-                Status = isSuccess ? PaymentStatus.Completed : PaymentStatus.Failed,
-                TransactionId = isSuccess ? iyzicoRequest.externalId : null,
+                Status = isValid ? PaymentStatus.Completed : PaymentStatus.Failed,
+                CardHolderName = dto.CardHolderName,
+                CardNumberMasked = MaskCardNumber(dto.CardNumber),
+                ExpireMonth = dto.ExpireMonth,
+                ExpireYear = dto.ExpireYear,   
+                InstallmentCount = dto.InstallmentCount,
+                TransactionId = transactionId,
                 CreatedByUserId = _currentUserService.UserId
             };
+
 
             await _paymentRepository.AddAsync(payment);
             await _unitOfWork.SaveChangesAsync();
@@ -90,8 +69,16 @@ namespace RentACarProject.Infrastructure.Services.Payments
                 PaymentDate = payment.PaymentDate,
                 Type = payment.Type,
                 Status = payment.Status,
-                TransactionId = payment.TransactionId
+                TransactionId = payment.TransactionId,
+                InstallmentCount = payment.InstallmentCount
             };
+        }
+
+        private string MaskCardNumber(string cardNumber)
+        {
+            if (cardNumber.Length < 4) return "****";
+            var last4 = cardNumber[^4..];
+            return $"**** **** **** {last4}";
         }
     }
 }

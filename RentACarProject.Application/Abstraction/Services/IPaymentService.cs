@@ -4,6 +4,7 @@ namespace RentACarProject.Application.Abstraction.Services
 {
     public interface IPaymentService
     {
-        Task<PaymentResponseDto> CreatePaymentAsync(CreatePaymentDto dto);
+        Task<PaymentResponseDto> CreateCardPaymentAsync(CreateCardPaymentDto dto);
+        Task<PaymentResponseDto> CreateBankTransferAsync(CreateBankTransferDto dto);
     }
 }

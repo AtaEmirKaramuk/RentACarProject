@@ -22,7 +22,12 @@ namespace RentACarProject.Application.Features.Payment.Commands
             if (payment == null || payment.IsDeleted)
                 throw new NotFoundException("Ödeme kaydı bulunamadı.");
 
+            if (payment.Status == request.NewStatus)
+                throw new BusinessException("Ödeme zaten bu durumda.");
+
             payment.Status = request.NewStatus;
+            payment.ModifiedDate = DateTime.UtcNow;
+
             await _paymentRepository.UpdateAsync(payment);
             await _unitOfWork.SaveChangesAsync();
 

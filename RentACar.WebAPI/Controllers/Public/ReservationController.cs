@@ -12,6 +12,7 @@ namespace RentACarProject.API.Controllers.Public
     [Route("api/public/[controller]")]
     [ApiController]
     [Authorize]
+    [ApiExplorerSettings(GroupName = "Public")]
     public class ReservationController : ControllerBase
     {
         private readonly IMediator _mediator;

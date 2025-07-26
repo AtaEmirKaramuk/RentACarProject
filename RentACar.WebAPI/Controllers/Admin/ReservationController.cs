@@ -9,6 +9,7 @@ namespace RentACarProject.API.Controllers.Admin
     [Route("api/admin/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "Admin")]
     public class ReservationController : ControllerBase
     {
         private readonly IMediator _mediator;

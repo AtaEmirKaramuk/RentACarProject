@@ -26,18 +26,22 @@ namespace RentACarProject.Application.Features.Reservation.Commands
 
         public async Task<ServiceResponse<string>> Handle(CancelReservationCommand request, CancellationToken cancellationToken)
         {
-            var reservation = await _reservationRepository.GetAsync(r => r.Id == request.Id);
+            var reservation = await _reservationRepository.GetAsync(r => r.Id == request.Id && !r.IsDeleted);
 
             if (reservation == null)
                 throw new NotFoundException("Rezervasyon bulunamadı.");
 
-            if (reservation.UserId != _currentUserService.UserId)
+            if (!_currentUserService.UserId.HasValue || reservation.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("Bu rezervasyona erişim izniniz yok.");
 
             if (reservation.Status == ReservationStatus.Cancelled)
                 throw new BusinessException("Rezervasyon zaten iptal edilmiş.");
 
+            if (reservation.Status == ReservationStatus.Completed)
+                throw new BusinessException("Tamamlanmış bir rezervasyon iptal edilemez.");
+
             reservation.Status = ReservationStatus.Cancelled;
+
             await _unitOfWork.SaveChangesAsync();
 
             return new ServiceResponse<string>

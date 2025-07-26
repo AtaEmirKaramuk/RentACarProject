@@ -5,11 +5,19 @@ namespace RentACarProject.Application.Features.Payment.Commands
 {
     public class ApproveBankTransferCommand : IRequest<PaymentResponseDto>
     {
-        public BankTransferApprovalDto Approval { get; set; }
+        public Guid PaymentId { get; set; }
+        public string TransactionId { get; set; }
 
-        public ApproveBankTransferCommand(BankTransferApprovalDto approval)
+        public ApproveBankTransferCommand(Guid paymentId, string transactionId)
         {
-            Approval = approval;
+            if (paymentId == Guid.Empty)
+                throw new ArgumentException("PaymentId boş olamaz.");
+
+            if (string.IsNullOrWhiteSpace(transactionId))
+                throw new ArgumentException("TransactionId boş olamaz.");
+
+            PaymentId = paymentId;
+            TransactionId = transactionId.Trim();
         }
     }
 }

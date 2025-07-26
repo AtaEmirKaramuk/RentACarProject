@@ -1,6 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Application.Features.Payment.Commands;
 using RentACarProject.Application.Features.Payment.Queries;
 using RentACarProject.Domain.Enums;
@@ -9,6 +9,8 @@ namespace RentACarProject.WebAPI.Controllers.Admin
 {
     [Route("api/admin/payments")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "Admin")]
     public class AdminPaymentController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,7 +20,7 @@ namespace RentACarProject.WebAPI.Controllers.Admin
             _mediator = mediator;
         }
 
-        // Tüm ödemeleri filtreyle getir
+        // 1. Tüm ödemeleri filtreyle getir
         [HttpGet]
         public async Task<IActionResult> GetAllPayments(
             [FromQuery] DateTime? startDate,
@@ -33,7 +35,7 @@ namespace RentACarProject.WebAPI.Controllers.Admin
             return Ok(result);
         }
 
-        // Bekleyen banka havalelerini getir
+        // 2. Bekleyen banka havalelerini getir
         [HttpGet("pending-bank-transfers")]
         public async Task<IActionResult> GetPendingBankTransfers()
         {
@@ -41,17 +43,21 @@ namespace RentACarProject.WebAPI.Controllers.Admin
             return Ok(result);
         }
 
-        // Havale onayla
+        // 3. Havale onayla (Yeni versiyon - dto kullanılmıyor)
         [HttpPost("bank-transfer/approve")]
-        public async Task<IActionResult> ApproveBankTransfer([FromBody] BankTransferApprovalDto dto)
+        public async Task<IActionResult> ApproveBankTransfer(
+            [FromQuery] Guid paymentId,
+            [FromQuery] string transactionId)
         {
-            var result = await _mediator.Send(new ApproveBankTransferCommand(dto));
+            var result = await _mediator.Send(new ApproveBankTransferCommand(paymentId, transactionId));
             return Ok(result);
         }
 
-        // Ödeme durumunu değiştir (örneğin admin geri ödeme yaptı)
+        // 4. Ödeme durumunu değiştir
         [HttpPatch("change-status")]
-        public async Task<IActionResult> ChangePaymentStatus([FromQuery] Guid paymentId, [FromQuery] PaymentStatus newStatus)
+        public async Task<IActionResult> ChangePaymentStatus(
+            [FromQuery] Guid paymentId,
+            [FromQuery] PaymentStatus newStatus)
         {
             var command = new ChangePaymentStatusCommand(paymentId, newStatus);
             var result = await _mediator.Send(command);

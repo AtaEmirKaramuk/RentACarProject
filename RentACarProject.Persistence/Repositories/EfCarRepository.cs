@@ -33,6 +33,14 @@ namespace RentACarProject.Persistence.Repositories
                 .Where(c => c.ModelId == modelId)
                 .ToListAsync();
         }
+        public async Task<Car?> GetCarWithModelAndBrandAsync(Guid carId)
+        {
+            return await _context.Cars
+                .Include(c => c.Model)
+                .ThenInclude(m => m.Brand)
+                .FirstOrDefaultAsync(c => c.CarId == carId);
+        }
+
 
         public async Task<List<Car>> GetCarsByYearAsync(int year)
         {
@@ -48,4 +56,5 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
     }
+
 }

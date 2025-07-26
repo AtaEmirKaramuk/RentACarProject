@@ -1,22 +1,20 @@
-﻿using MediatR;
-using RentACarProject.Application.Abstraction.Repositories;
+﻿using RentACarProject.Application.Abstraction.Repositories;
+using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Application.Exceptions;
-using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Domain.Entities;
 using RentACarProject.Domain.Enums;
-using PaymentEntity = RentACarProject.Domain.Entities.Payment; 
 
-namespace RentACarProject.Application.Features.Payment.Commands
+namespace RentACarProject.Infrastructure.Services.Payments
 {
-    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, PaymentResponseDto>
+    public class InternalBankTransferPaymentService : IPaymentStrategyService<CreateBankTransferDto>
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IReservationRepository _reservationRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
 
-        public CreatePaymentCommandHandler(
+        public InternalBankTransferPaymentService(
             IPaymentRepository paymentRepository,
             IReservationRepository reservationRepository,
             IUnitOfWork unitOfWork,
@@ -28,29 +26,25 @@ namespace RentACarProject.Application.Features.Payment.Commands
             _currentUserService = currentUserService;
         }
 
-        public async Task<PaymentResponseDto> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<PaymentResponseDto> ProcessPaymentAsync(CreateBankTransferDto dto)
         {
-            var dto = request.Payment;
-
             var reservation = await _reservationRepository.GetReservationByIdAsync(dto.ReservationId);
             if (reservation == null || reservation.IsDeleted)
                 throw new NotFoundException("Rezervasyon bulunamadı.");
 
-            if (reservation.Customer.UserId != _currentUserService.UserId)
-                throw new ForbiddenAccessException("Bu rezervasyon size ait değil.");
+            var transactionId = $"BANK-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString()[..6]}";
 
-            var payment = new PaymentEntity
+            var payment = new Payment
             {
                 PaymentId = Guid.NewGuid(),
                 ReservationId = dto.ReservationId,
                 Amount = dto.Amount,
                 PaymentDate = DateTime.UtcNow,
-                Type = dto.Type,
-                Status = dto.Type == PaymentType.BankTransfer ? PaymentStatus.Pending : PaymentStatus.Completed,
-                TransactionId = dto.TransactionId,
+                Type = PaymentType.BankTransfer,
+                Status = PaymentStatus.Pending,
                 SenderIban = dto.SenderIban,
                 SenderName = dto.SenderName,
-                CreatedDate = DateTime.UtcNow,
+                TransactionId = transactionId,
                 CreatedByUserId = _currentUserService.UserId
             };
 

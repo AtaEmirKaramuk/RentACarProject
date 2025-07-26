@@ -5,11 +5,14 @@ namespace RentACarProject.Application.Features.Payment.Commands
 {
     public class ChangePaymentStatusCommand : IRequest<bool>
     {
-        public Guid PaymentId { get; set; }
-        public PaymentStatus NewStatus { get; set; }
+        public Guid PaymentId { get; }
+        public PaymentStatus NewStatus { get; }
 
         public ChangePaymentStatusCommand(Guid paymentId, PaymentStatus newStatus)
         {
+            if (paymentId == Guid.Empty)
+                throw new ArgumentException("PaymentId boş olamaz.");
+
             PaymentId = paymentId;
             NewStatus = newStatus;
         }

@@ -1,7 +1,8 @@
-﻿using Application.Features.PasswordChange.Commands.InitiatePasswordChange;
-using Application.Features.PasswordChange.Commands.ConfirmPasswordChange;
+﻿using Application.Features.PasswordChange.Commands.ConfirmPasswordChange;
+using Application.Features.PasswordChange.Commands.InitiatePasswordChange;
 using Application.Features.PasswordChange.Dtos;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RentACarProject.WebAPI.Controllers.Public
@@ -9,6 +10,7 @@ namespace RentACarProject.WebAPI.Controllers.Public
     [ApiExplorerSettings(GroupName = "Public")]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class PasswordChangeController : ControllerBase
     {
         private readonly IMediator _mediator;

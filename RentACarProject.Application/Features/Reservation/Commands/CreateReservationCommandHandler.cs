@@ -35,25 +35,32 @@ namespace RentACarProject.Application.Features.Reservation.Commands
         {
             var dto = request.Reservation;
 
-            var car = await _carRepository.GetAsync(c => c.CarId == dto.CarId);
+            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
             if (car == null)
                 throw new BusinessException("Araç bulunamadı.");
 
-            var pickupLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId);
+            var pickupLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId && !l.IsDeleted);
             if (pickupLocation == null)
                 throw new BusinessException("Alış lokasyonu bulunamadı.");
 
-            var dropoffLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId);
+            var dropoffLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId && !l.IsDeleted);
             if (dropoffLocation == null)
                 throw new BusinessException("Teslim lokasyonu bulunamadı.");
 
             if (dto.StartDate >= dto.EndDate)
-                throw new BusinessException("Başlangıç tarihi bitiş tarihinden büyük veya eşit olamaz.");
-
-            var totalDays = (dto.EndDate.Date - dto.StartDate.Date).Days;
-            if (totalDays <= 0)
                 throw new BusinessException("Rezervasyon süresi en az 1 gün olmalıdır.");
 
+            // 🚨 Rezervasyon çakışma kontrolü
+            var conflictingReservations = await _reservationRepository.GetReservationsByCarIdAsync(dto.CarId);
+            var hasConflict = conflictingReservations.Any(r =>
+                r.Status == ReservationStatus.Active &&
+                r.StartDate < dto.EndDate &&
+                r.EndDate > dto.StartDate);
+
+            if (hasConflict)
+                throw new BusinessException("Belirtilen tarihlerde bu araç zaten rezerve edilmiştir.");
+
+            var totalDays = (dto.EndDate.Date - dto.StartDate.Date).Days;
             var totalPrice = car.DailyPrice * totalDays;
 
             if (!_currentUserService.UserId.HasValue)

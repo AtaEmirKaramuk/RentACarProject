@@ -2,8 +2,8 @@
 
 namespace RentACarProject.Application.Abstraction.Services
 {
-    public interface IPaymentStrategyService
+    public interface IPaymentStrategyService<TDto>
     {
-        Task<PaymentResponseDto> ProcessPaymentAsync(CreatePaymentDto dto);
+        Task<PaymentResponseDto> ProcessPaymentAsync(TDto dto);
     }
 }

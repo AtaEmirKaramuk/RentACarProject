@@ -2,7 +2,6 @@
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Exceptions;
-using RentACarProject.Application.Services;
 using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Application.Features.Payment.Commands

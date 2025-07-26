@@ -19,17 +19,18 @@ namespace RentACarProject.Application.Features.Payment.Commands
 
         public async Task<PaymentResponseDto> Handle(ApproveBankTransferCommand request, CancellationToken cancellationToken)
         {
-            var dto = request.Approval;
-
-            var payment = await _paymentRepository.GetPaymentByIdAsync(dto.PaymentId);
+            var payment = await _paymentRepository.GetPaymentByIdAsync(request.PaymentId);
             if (payment == null || payment.IsDeleted)
                 throw new NotFoundException("Ödeme bulunamadı.");
 
             if (payment.Type != PaymentType.BankTransfer)
                 throw new BusinessException("Sadece banka havalesi ödemeleri onaylanabilir.");
 
+            if (payment.Status == PaymentStatus.Completed)
+                throw new BusinessException("Bu ödeme zaten onaylanmış.");
+
             payment.Status = PaymentStatus.Completed;
-            payment.TransactionId = dto.TransactionId;
+            payment.TransactionId = request.TransactionId;
 
             await _paymentRepository.UpdateAsync(payment);
             await _unitOfWork.SaveChangesAsync();

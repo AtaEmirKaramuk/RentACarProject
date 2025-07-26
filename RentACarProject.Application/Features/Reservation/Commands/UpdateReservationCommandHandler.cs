@@ -35,20 +35,22 @@ namespace RentACarProject.Application.Features.Reservation.Commands
         {
             var dto = request.Reservation;
 
-            var reservation = await _reservationRepository.GetAsync(r => r.Id == dto.Id);
+            var reservation = await _reservationRepository.GetAsync(r => r.Id == dto.Id && !r.IsDeleted);
             if (reservation == null)
                 throw new NotFoundException("Rezervasyon bulunamadı.");
 
             if (reservation.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("Bu rezervasyonu güncelleme yetkiniz yok.");
 
-            var car = await _carRepository.GetAsync(c => c.CarId == dto.CarId)
-                      ?? throw new BusinessException("Araç bulunamadı.");
+            // Navigation property'ler için include'lu özel sorgu kullanıyoruz
+            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
+            if (car == null || car.IsDeleted)
+                throw new BusinessException("Araç bulunamadı.");
 
-            var pickup = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId)
+            var pickup = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId && !l.IsDeleted)
                         ?? throw new BusinessException("Alış lokasyonu bulunamadı.");
 
-            var dropoff = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId)
+            var dropoff = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId && !l.IsDeleted)
                          ?? throw new BusinessException("Teslim lokasyonu bulunamadı.");
 
             if (dto.StartDate >= dto.EndDate)
@@ -58,14 +60,24 @@ namespace RentACarProject.Application.Features.Reservation.Commands
             if (totalDays <= 0)
                 throw new BusinessException("Rezervasyon süresi en az 1 gün olmalıdır.");
 
-            var totalPrice = car.DailyPrice * totalDays;
+            // Çakışma kontrolü (başka bir aktif rezervasyonla)
+            var hasConflict = (await _reservationRepository.GetReservationsByCarIdAsync(dto.CarId))
+                .Any(r =>
+                    r.Id != reservation.Id &&
+                    r.Status == ReservationStatus.Active &&
+                    r.StartDate < dto.EndDate &&
+                    r.EndDate > dto.StartDate);
 
+            if (hasConflict)
+                throw new BusinessException("Belirtilen tarihlerde bu araç başka bir rezervasyonda.");
+
+            // Güncelleme
             reservation.CarId = dto.CarId;
             reservation.PickupLocationId = dto.PickupLocationId;
             reservation.DropoffLocationId = dto.DropoffLocationId;
             reservation.StartDate = dto.StartDate;
             reservation.EndDate = dto.EndDate;
-            reservation.TotalPrice = totalPrice;
+            reservation.TotalPrice = car.DailyPrice * totalDays;
 
             await _unitOfWork.SaveChangesAsync();
 

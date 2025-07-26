@@ -19,8 +19,4 @@
     <ProjectReference Include="..\RentACarProject.Domain\RentACarProject.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Payment\Validators\" />
-  </ItemGroup>
-
 </Project>

@@ -9,5 +9,6 @@ namespace RentACarProject.Application.Abstraction.Repositories
         Task<List<Car>> GetCarsByModelIdAsync(Guid modelId);
         Task<List<Car>> GetCarsByYearAsync(int year);
         Task<List<Car>> GetCarsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
+        Task<Car?> GetCarWithModelAndBrandAsync(Guid carId);
     }
 }

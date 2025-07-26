@@ -12,7 +12,6 @@ namespace RentACarProject.Persistence.Repositories
         {
         }
 
-        // Aktif (şu an devam eden) rezervasyonları getirir.
         public async Task<List<Reservation>> GetActiveReservationsAsync()
         {
             var now = DateTime.UtcNow;
@@ -23,7 +22,6 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // Belirli bir kullanıcıya (UserId) ait rezervasyonları ilişkili verilerle birlikte getirir.
         public async Task<List<Reservation>> GetReservationsByUserIdAsync(Guid userId)
         {
             return await _context.Reservations
@@ -34,7 +32,6 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // Belirli bir araca ait rezervasyonları getirir.
         public async Task<List<Reservation>> GetReservationsByCarIdAsync(Guid carId)
         {
             return await _context.Reservations
@@ -42,7 +39,6 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // Tamamlanmış (EndDate geçmiş ve status = Completed olan) rezervasyonları getirir.
         public async Task<List<Reservation>> GetCompletedReservationsAsync()
         {
             var now = DateTime.UtcNow;
@@ -53,7 +49,6 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // Verilen tarih aralığına denk gelen rezervasyonları getirir (çakışanlar).
         public async Task<List<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             return await _context.Reservations
@@ -64,7 +59,6 @@ namespace RentACarProject.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // Bir rezervasyonu ödeme bilgileri, araç, model, marka ve lokasyonlarla birlikte getirir.
         public async Task<Reservation?> GetReservationWithPaymentsAsync(Guid reservationId)
         {
             return await _context.Reservations
@@ -75,13 +69,13 @@ namespace RentACarProject.Persistence.Repositories
                 .FirstOrDefaultAsync(r => r.Id == reservationId);
         }
 
-
         public async Task<Reservation?> GetReservationByIdAsync(Guid id)
         {
-            return await Query().FirstOrDefaultAsync(r => r.Id == id);
+            return await _context.Reservations
+                .Include(r => r.Customer) // 🔥 Burada Customer dahil edildi
+                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
         }
 
-        // Bir rezervasyonu tüm ilişkili verileriyle (Car, Model, Brand, Locations) birlikte getirir.
         public async Task<Reservation?> GetByIdWithDetailsAsync(Guid id)
         {
             return await _context.Reservations

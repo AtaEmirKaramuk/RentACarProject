@@ -10,7 +10,8 @@ namespace RentACarProject.API.Controllers.Public
 {
     [Route("api/public/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "User")]
+    [ApiExplorerSettings(GroupName = "Public")]
     public class ProfileController : ControllerBase
     {
         private readonly IMediator _mediator;
