@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
+using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Payment;
 
 namespace RentACarProject.Application.Features.Payment.Queries
 {
-    public class GetAllPaymentsWithFiltersQueryHandler : IRequestHandler<GetAllPaymentsWithFiltersQuery, List<PaymentResponseDto>>
+    public class GetAllPaymentsWithFiltersQueryHandler : IRequestHandler<GetAllPaymentsWithFiltersQuery, ServiceResponse<List<PaymentResponseDto>>>
     {
         private readonly IPaymentRepository _paymentRepository;
 
@@ -13,7 +14,7 @@ namespace RentACarProject.Application.Features.Payment.Queries
             _paymentRepository = paymentRepository;
         }
 
-        public async Task<List<PaymentResponseDto>> Handle(GetAllPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<List<PaymentResponseDto>>> Handle(GetAllPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
         {
             var payments = await _paymentRepository.GetAllPaymentsWithFiltersAsync(
                 request.StartDate,
@@ -24,9 +25,9 @@ namespace RentACarProject.Application.Features.Payment.Queries
                 request.UserId
             );
 
-            return payments.Select(p => new PaymentResponseDto
+            var result = payments.Select(p => new PaymentResponseDto
             {
-                PaymentId = p.PaymentId,
+                Id = p.Id,
                 ReservationId = p.ReservationId,
                 Amount = p.Amount,
                 PaymentDate = p.PaymentDate,
@@ -36,6 +37,13 @@ namespace RentACarProject.Application.Features.Payment.Queries
                 SenderIban = p.SenderIban,
                 SenderName = p.SenderName
             }).ToList();
+
+            return new ServiceResponse<List<PaymentResponseDto>>
+            {
+                Success = true,
+                Message = "Filtrelenmiş ödemeler listelendi.",
+                Data = result
+            };
         }
     }
 }

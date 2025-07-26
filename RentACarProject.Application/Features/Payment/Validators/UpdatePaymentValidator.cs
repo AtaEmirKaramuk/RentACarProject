@@ -7,8 +7,8 @@ namespace RentACarProject.Application.Validators.Payment
     {
         public UpdatePaymentValidator()
         {
-            RuleFor(x => x.PaymentId)
-                .NotEmpty().WithMessage("PaymentId boş olamaz.");
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("Ödeme ID boş olamaz.");
 
             RuleFor(x => x.Status)
                 .IsInEnum().WithMessage("Geçersiz ödeme durumu.");

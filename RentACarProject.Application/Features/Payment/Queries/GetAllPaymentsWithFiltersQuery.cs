@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Domain.Enums;
 
 namespace RentACarProject.Application.Features.Payment.Queries
 {
-    public class GetAllPaymentsWithFiltersQuery : IRequest<List<PaymentResponseDto>>
+    public class GetAllPaymentsWithFiltersQuery : IRequest<ServiceResponse<List<PaymentResponseDto>>>
     {
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

@@ -32,7 +32,7 @@ namespace RentACarProject.Persistence.Repositories
         public async Task<Payment?> GetPaymentByIdAsync(Guid paymentId)
         {
             return await _context.Payments
-                .FirstOrDefaultAsync(p => p.PaymentId == paymentId && !p.IsDeleted);
+                .FirstOrDefaultAsync(p => p.Id == paymentId && !p.IsDeleted);
         }
 
         public async Task<List<Payment>> GetUserPaymentsWithFiltersAsync(Guid userId, DateTime? startDate = null, DateTime? endDate = null, PaymentStatus? status = null, PaymentType? type = null)

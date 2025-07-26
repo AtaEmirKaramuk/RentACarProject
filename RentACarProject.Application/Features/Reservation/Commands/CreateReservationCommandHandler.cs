@@ -35,36 +35,43 @@ namespace RentACarProject.Application.Features.Reservation.Commands
         {
             var dto = request.Reservation;
 
-            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
-            if (car == null)
-                throw new BusinessException("Araç bulunamadı.");
-
-            var pickupLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId && !l.IsDeleted);
-            if (pickupLocation == null)
-                throw new BusinessException("Alış lokasyonu bulunamadı.");
-
-            var dropoffLocation = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId && !l.IsDeleted);
-            if (dropoffLocation == null)
-                throw new BusinessException("Teslim lokasyonu bulunamadı.");
+            if (!_currentUserService.UserId.HasValue)
+                throw new BusinessException("Kullanıcı doğrulanamadı.");
 
             if (dto.StartDate >= dto.EndDate)
+                throw new BusinessException("Başlangıç tarihi bitiş tarihinden önce olmalıdır.");
+
+            var totalDays = (dto.EndDate.Date - dto.StartDate.Date).Days;
+            if (totalDays <= 0)
                 throw new BusinessException("Rezervasyon süresi en az 1 gün olmalıdır.");
 
-            // 🚨 Rezervasyon çakışma kontrolü
+            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
+            if (car == null || car.IsDeleted)
+                throw new BusinessException("Seçilen araç sistemde bulunamadı.");
+
+            var pickupLocation = await _locationRepository.GetAsync(l => l.Id == dto.PickupLocationId && !l.IsDeleted);
+            if (pickupLocation == null)
+                throw new BusinessException("Alış lokasyonu geçerli değil.");
+
+            var dropoffLocation = await _locationRepository.GetAsync(l => l.Id == dto.DropoffLocationId && !l.IsDeleted);
+            if (dropoffLocation == null)
+                throw new BusinessException("Teslim lokasyonu geçerli değil.");
+
             var conflictingReservations = await _reservationRepository.GetReservationsByCarIdAsync(dto.CarId);
             var hasConflict = conflictingReservations.Any(r =>
-                r.Status == ReservationStatus.Active &&
+                r.Status != ReservationStatus.Cancelled &&
+                r.Status != ReservationStatus.Failed &&
                 r.StartDate < dto.EndDate &&
                 r.EndDate > dto.StartDate);
 
             if (hasConflict)
-                throw new BusinessException("Belirtilen tarihlerde bu araç zaten rezerve edilmiştir.");
+                throw new BusinessException("Bu araç seçilen tarihlerde rezerve edilmiştir.");
 
-            var totalDays = (dto.EndDate.Date - dto.StartDate.Date).Days;
+            var userReservations = await _reservationRepository.GetReservationsByUserIdAsync(_currentUserService.UserId.Value);
+            if (userReservations.Any(r => r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Active))
+                throw new BusinessException("Aktif veya bekleyen bir rezervasyonunuz zaten var.");
+
             var totalPrice = car.DailyPrice * totalDays;
-
-            if (!_currentUserService.UserId.HasValue)
-                throw new BusinessException("Kullanıcı kimliği alınamadı.");
 
             var reservation = new ReservationEntity
             {
@@ -76,7 +83,8 @@ namespace RentACarProject.Application.Features.Reservation.Commands
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 TotalPrice = totalPrice,
-                Status = ReservationStatus.Active
+                Status = ReservationStatus.Pending, // 🔄 Güncellendi!
+                CreatedByUserId = _currentUserService.UserId
             };
 
             await _reservationRepository.AddAsync(reservation);
@@ -99,7 +107,7 @@ namespace RentACarProject.Application.Features.Reservation.Commands
             return new ServiceResponse<ReservationResponseDto>
             {
                 Success = true,
-                Message = "Rezervasyon başarıyla oluşturuldu.",
+                Message = "Rezervasyon başarıyla oluşturuldu. Ödeme bekleniyor.",
                 Data = responseDto
             };
         }

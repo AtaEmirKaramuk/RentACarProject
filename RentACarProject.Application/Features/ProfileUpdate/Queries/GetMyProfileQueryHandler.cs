@@ -27,7 +27,7 @@ namespace RentACarProject.Application.Features.ProfileUpdate.Queries
 
             var user = await _userRepository.Query()
                 .Include(u => u.Customer)
-                .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user == null)
                 throw new NotFoundException("Kullanıcı bulunamadı.");

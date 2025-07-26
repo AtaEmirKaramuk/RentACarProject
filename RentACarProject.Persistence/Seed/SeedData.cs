@@ -37,7 +37,7 @@ namespace RentACarProject.Persistence.Seed
 
             var adminUser = new User
             {
-                UserId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserName = username,
                 Email = email,
                 PasswordHash = HashPassword(password),

@@ -6,7 +6,7 @@
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedDate { get; set; }
-        public Guid? CreatedByUserId { get; set; } 
-        public Guid? ModifiedByUserId { get; set; } 
+        public Guid? CreatedByUserId { get; set; }
+        public Guid? ModifiedByUserId { get; set; }
     }
-} 
+}

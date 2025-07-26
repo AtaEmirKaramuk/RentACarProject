@@ -1,122 +1,83 @@
 ﻿using System.Text;
-using Abstraction.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Infrastructure.Email;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RentACarProject.API.Middlewares;
-using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Behaviors;
 using RentACarProject.Application.Features.Auth.Commands;
-using RentACarProject.Application.Services;
+using RentACarProject.Application.Settings; // <-- ✅ JwtSettings burada
 using RentACarProject.Application.Validators.Auth;
-using RentACarProject.Infrastructure.Configurations;
+using RentACarProject.Infrastructure.DependencyInjection;
 using RentACarProject.Infrastructure.Services;
-using RentACarProject.Infrastructure.Services.Payments;
 using RentACarProject.Persistence.Context;
-using RentACarProject.Persistence.Repositories;
+using RentACarProject.Persistence.DependencyInjection;
 using RentACarProject.Persistence.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers & Swagger
+// 🔹 Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("Admin", new() { Title = "Admin API", Version = "v1" });
-    options.SwaggerDoc("Public", new() { Title = "Public API", Version = "v1" });
+    options.SwaggerDoc("Admin", new OpenApiInfo { Title = "Admin API", Version = "v1" });
+    options.SwaggerDoc("Public", new OpenApiInfo { Title = "Public API", Version = "v1" });
 
-    options.AddSecurityDefinition("Bearer", new()
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Bearer token. Örn: 'Bearer {token}'",
         Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
 
-    options.AddSecurityRequirement(new()
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new()
+            new OpenApiSecurityScheme
             {
-                Reference = new() { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" },
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
                 Scheme = "oauth2",
                 Name = "Bearer",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header
+                In = ParameterLocation.Header
             },
             new List<string>()
         }
     });
 });
 
-// DbContext
+// 🔹 DbContext
 builder.Services.AddDbContext<RentACarDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repositories
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUserRepository, EfUserRepository>();
-builder.Services.AddScoped<ICustomerRepository, EfCustomerRepository>();
-builder.Services.AddScoped<ICarRepository, EfCarRepository>();
-builder.Services.AddScoped<IBrandRepository, EfBrandRepository>();
-builder.Services.AddScoped<IModelRepository, EfModelRepository>();
-builder.Services.AddScoped<IReservationRepository, EfReservationRepository>();
-builder.Services.AddScoped<IPaymentRepository, EfPaymentRepository>();
-builder.Services.AddScoped<ILocationRepository, EfLocationRepository>();
+// 🔹 JWT Settings & Service Registration
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-// Services
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+// 🔹 Service Registrations
+builder.Services.AddRepositories();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
-// JWT
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "DEFAULT_SECRET_KEY";
-var key = Encoding.ASCII.GetBytes(jwtKey);
-builder.Services.AddSingleton(new JwtTokenService(jwtKey));
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-
-builder.Services.AddAuthorization();
-
-// Validation & MediatR
+// 🔹 FluentValidation & MediatR
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(RegisterCommandHandler).Assembly));
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddFluentValidationClientsideAdapters();
 
-// Common
+// 🔹 Common services
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 
-// Payment Strategy (Internal)
-builder.Services.AddScoped<IPaymentStrategyFactory, PaymentStrategyFactory>();
-builder.Services.AddScoped<InternalBankTransferPaymentService>();
-builder.Services.AddScoped<InternalCardPaymentService>(); // ✅ Kart ödeme servisini de unutma!
-
-// Build app
+// 🔹 Build app
 var app = builder.Build();
 
-// Seed admin
+// 🔹 Seed admin
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<RentACarDbContext>();
@@ -124,7 +85,7 @@ using (var scope = app.Services.CreateScope())
     SeedData.SeedAdminUser(dbContext, configuration);
 }
 
-// Middleware
+// 🔹 Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

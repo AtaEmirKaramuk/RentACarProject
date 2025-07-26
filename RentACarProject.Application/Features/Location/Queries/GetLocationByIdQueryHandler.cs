@@ -24,7 +24,7 @@ namespace RentACarProject.Application.Features.Location.Queries
 
             return new LocationResponseDto
             {
-                LocationId = location.LocationId,
+                Id = location.Id,
                 Name = location.Name,
                 City = location.City,
                 Address = location.Address,

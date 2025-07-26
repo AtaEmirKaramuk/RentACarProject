@@ -1,7 +1,8 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RentACarProject.Application.Features.Location.Queries;
 using RentACarProject.Application.DTOs.Location;
+using RentACarProject.Application.Features.Location.Queries;
 
 namespace RentACarProject.WebAPI.Controllers.Public
 {
@@ -16,7 +17,7 @@ namespace RentACarProject.WebAPI.Controllers.Public
         {
             _mediator = mediator;
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<LocationResponseDto>>> GetAll()
         {

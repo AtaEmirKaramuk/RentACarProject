@@ -1,9 +1,10 @@
 ﻿using MediatR;
+using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Payment;
 
 namespace RentACarProject.Application.Features.Payment.Queries
 {
-    public class GetPaymentsByReservationIdQuery : IRequest<List<PaymentResponseDto>>
+    public class GetPaymentsByReservationIdQuery : IRequest<ServiceResponse<List<PaymentResponseDto>>>
     {
         public Guid ReservationId { get; set; }
 

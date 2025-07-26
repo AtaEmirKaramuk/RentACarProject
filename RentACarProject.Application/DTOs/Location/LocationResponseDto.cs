@@ -2,7 +2,7 @@
 {
     public class LocationResponseDto
     {
-        public Guid LocationId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string City { get; set; } = null!;
         public string Address { get; set; } = null!;

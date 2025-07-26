@@ -22,7 +22,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
         public async Task<ServiceResponse<DeletedCarDto>> Handle(DeleteCarCommand request, CancellationToken cancellationToken)
         {
-            var car = await _carRepository.GetAsync(c => c.CarId == request.Id);
+            var car = await _carRepository.GetAsync(c => c.Id == request.Id);
             if (car == null)
             {
                 throw new BusinessException("Araç bulunamadı.");
@@ -30,7 +30,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
             var model = await _modelRepository.Query()
                 .Include(m => m.Brand)
-                .FirstOrDefaultAsync(m => m.ModelId == car.ModelId, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == car.ModelId, cancellationToken);
 
             if (model == null)
             {
@@ -42,7 +42,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
             var dto = new DeletedCarDto
             {
-                Id = car.CarId,
+                Id = car.Id,
                 Plate = car.Plate,
                 ModelName = model.Name,
                 BrandName = model.Brand.Name

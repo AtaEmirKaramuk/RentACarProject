@@ -14,21 +14,26 @@ namespace RentACarProject.Application.Validators.Payment
                 .GreaterThan(0).WithMessage("Ödeme tutarı sıfırdan büyük olmalıdır.");
 
             RuleFor(x => x.CardHolderName)
-                .NotEmpty().WithMessage("Kart sahibi adı zorunludur.");
+                .NotEmpty().WithMessage("Kart sahibi adı girilmelidir.")
+                .MaximumLength(100).WithMessage("Kart sahibi adı en fazla 100 karakter olmalıdır.");
 
             RuleFor(x => x.CardNumber)
-                .NotEmpty().WithMessage("Kart numarası zorunludur.")
-                .CreditCard().WithMessage("Geçersiz kart numarası.");
+                .NotEmpty().WithMessage("Kart numarası girilmelidir.")
+                .Matches(@"^\d{16}$").WithMessage("Kart numarası 16 haneli olmalıdır.");
 
             RuleFor(x => x.ExpireMonth)
-                .NotEmpty().WithMessage("Son kullanma ayı zorunludur.");
+                .InclusiveBetween(1, 12).WithMessage("Son kullanma ayı 1 ile 12 arasında olmalıdır.");
 
             RuleFor(x => x.ExpireYear)
-                .NotEmpty().WithMessage("Son kullanma yılı zorunludur.");
+                .GreaterThanOrEqualTo(DateTime.UtcNow.Year).WithMessage("Geçerli bir yıl girilmelidir.");
 
             RuleFor(x => x.Cvc)
-                .NotEmpty().WithMessage("CVC zorunludur.")
-                .Length(3).WithMessage("CVC 3 haneli olmalıdır.");
+                .NotEmpty().WithMessage("CVC kodu girilmelidir.")
+                .Length(3).WithMessage("CVC kodu 3 haneli olmalıdır.");
+
+            RuleFor(x => x.InstallmentCount)
+                .InclusiveBetween(1, 12).When(x => x.InstallmentCount.HasValue)
+                .WithMessage("Taksit sayısı 1 ile 12 arasında olmalıdır.");
         }
     }
 }

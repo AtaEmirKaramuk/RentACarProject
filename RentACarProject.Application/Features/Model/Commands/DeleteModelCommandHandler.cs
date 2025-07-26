@@ -19,7 +19,7 @@ namespace RentACarProject.Application.Features.Model.Commands
 
         public async Task<ServiceResponse<DeletedModelDto>> Handle(DeleteModelCommand request, CancellationToken cancellationToken)
         {
-            var model = await _modelRepository.GetAsync(m => m.ModelId == request.ModelId);
+            var model = await _modelRepository.GetAsync(m => m.Id == request.ModelId);
             if (model == null)
             {
                 throw new BusinessException("Model bulunamadı.");
@@ -30,7 +30,7 @@ namespace RentACarProject.Application.Features.Model.Commands
 
             var dto = new DeletedModelDto
             {
-                Id = model.ModelId,
+                Id = model.Id,
                 Name = model.Name,
                 BrandId = model.BrandId
             };

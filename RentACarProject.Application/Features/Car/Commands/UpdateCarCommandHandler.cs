@@ -23,13 +23,13 @@ namespace RentACarProject.Application.Features.Car.Commands
 
         public async Task<ServiceResponse<CarResponseDto>> Handle(UpdateCarCommand request, CancellationToken cancellationToken)
         {
-            var car = await _carRepository.GetAsync(c => c.CarId == request.CarId);
+            var car = await _carRepository.GetAsync(c => c.Id == request.CarId);
             if (car == null)
                 throw new BusinessException("Araç bulunamadı.");
 
             var model = await _modelRepository.Query()
                 .Include(m => m.Brand)
-                .FirstOrDefaultAsync(m => m.ModelId == request.ModelId, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == request.ModelId, cancellationToken);
 
             if (model == null)
                 throw new BusinessException("Model bulunamadı.");
@@ -37,7 +37,7 @@ namespace RentACarProject.Application.Features.Car.Commands
             // ✅ Aynı plaka başka bir araçta var mı kontrolü
             var carWithSamePlate = await _carRepository.GetAsync(c =>
                 c.Plate.ToLower() == request.Plate.ToLower() &&
-                c.CarId != request.CarId);
+                c.Id != request.CarId);
             if (carWithSamePlate != null)
                 throw new BusinessException($"\"{request.Plate}\" plakalı başka bir araç zaten mevcut.");
 
@@ -56,7 +56,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
             var dto = new CarResponseDto
             {
-                Id = car.CarId,
+                Id = car.Id,
                 BrandName = model.Brand.Name,
                 ModelName = model.Name,
                 Year = car.Year,

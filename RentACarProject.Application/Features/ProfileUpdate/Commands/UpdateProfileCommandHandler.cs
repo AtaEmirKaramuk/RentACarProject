@@ -33,7 +33,7 @@ namespace RentACarProject.Application.Features.ProfileUpdate.Commands
 
             var user = await _userRepository.Query()
                 .Include(u => u.Customer)
-                .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user == null)
                 throw new NotFoundException("Kullanıcı bulunamadı.");
@@ -47,7 +47,7 @@ namespace RentACarProject.Application.Features.ProfileUpdate.Commands
             if (!string.IsNullOrWhiteSpace(request.Profile.Email) && request.Profile.Email != customer.Email)
             {
                 var emailExists = await _userRepository.ExistsAsync(u =>
-                    u.Email == request.Profile.Email && u.UserId != user.UserId);
+                    u.Email == request.Profile.Email && u.Id != user.Id);
 
                 if (emailExists)
                     throw new BusinessException("Bu email adresi zaten kullanımda.");
@@ -63,7 +63,7 @@ namespace RentACarProject.Application.Features.ProfileUpdate.Commands
                     .Include(u => u.Customer)
                     .AnyAsync(u => u.Customer != null &&
                                    u.Customer.Phone == request.Profile.Phone &&
-                                   u.UserId != user.UserId);
+                                   u.Id != user.Id);
 
                 if (phoneExists)
                     throw new BusinessException("Bu telefon numarası zaten kullanımda.");

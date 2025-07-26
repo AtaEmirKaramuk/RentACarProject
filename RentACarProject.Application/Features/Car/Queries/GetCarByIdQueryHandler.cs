@@ -20,7 +20,7 @@ namespace RentACarProject.Application.Features.Car.Queries
             var car = await _carRepository.Query()
                 .Include(c => c.Model)
                 .ThenInclude(m => m.Brand)
-                .FirstOrDefaultAsync(c => c.CarId == request.CarId);
+                .FirstOrDefaultAsync(c => c.Id == request.CarId);
 
             if (car == null)
             {
@@ -34,7 +34,7 @@ namespace RentACarProject.Application.Features.Car.Queries
 
             var dto = new CarResponseDto
             {
-                Id = car.CarId,
+                Id = car.Id,
                 BrandName = car.Model.Brand.Name,
                 ModelName = car.Model.Name,
                 Year = car.Year,

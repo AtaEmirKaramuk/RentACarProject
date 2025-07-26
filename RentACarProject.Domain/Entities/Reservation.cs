@@ -1,13 +1,11 @@
 ﻿using RentACarProject.Domain.Common;
 using RentACarProject.Domain.Enums;
-using System;
-using System.Collections.Generic;
 
 namespace RentACarProject.Domain.Entities
 {
     public class Reservation : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public Guid CarId { get; set; }
         public Guid UserId { get; set; }
         public Guid PickupLocationId { get; set; }

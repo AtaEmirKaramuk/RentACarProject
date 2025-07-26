@@ -35,6 +35,9 @@ namespace RentACarProject.Application.Features.Reservation.Commands
         {
             var dto = request.Reservation;
 
+            if (!_currentUserService.UserId.HasValue)
+                throw new BusinessException("Kullanıcı doğrulanamadı.");
+
             var reservation = await _reservationRepository.GetAsync(r => r.Id == dto.Id && !r.IsDeleted);
             if (reservation == null)
                 throw new NotFoundException("Rezervasyon bulunamadı.");
@@ -42,25 +45,30 @@ namespace RentACarProject.Application.Features.Reservation.Commands
             if (reservation.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("Bu rezervasyonu güncelleme yetkiniz yok.");
 
-            // Navigation property'ler için include'lu özel sorgu kullanıyoruz
-            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
-            if (car == null || car.IsDeleted)
-                throw new BusinessException("Araç bulunamadı.");
+            if (reservation.Status == ReservationStatus.Cancelled)
+                throw new BusinessException("İptal edilmiş rezervasyonlar güncellenemez.");
 
-            var pickup = await _locationRepository.GetAsync(l => l.LocationId == dto.PickupLocationId && !l.IsDeleted)
-                        ?? throw new BusinessException("Alış lokasyonu bulunamadı.");
-
-            var dropoff = await _locationRepository.GetAsync(l => l.LocationId == dto.DropoffLocationId && !l.IsDeleted)
-                         ?? throw new BusinessException("Teslim lokasyonu bulunamadı.");
+            if (reservation.Status == ReservationStatus.Completed)
+                throw new BusinessException("Tamamlanmış rezervasyonlar güncellenemez.");
 
             if (dto.StartDate >= dto.EndDate)
-                throw new BusinessException("Başlangıç tarihi bitiş tarihinden büyük veya eşit olamaz.");
+                throw new BusinessException("Başlangıç tarihi bitiş tarihinden önce olmalıdır.");
 
             var totalDays = (dto.EndDate.Date - dto.StartDate.Date).Days;
             if (totalDays <= 0)
                 throw new BusinessException("Rezervasyon süresi en az 1 gün olmalıdır.");
 
-            // Çakışma kontrolü (başka bir aktif rezervasyonla)
+            var car = await _carRepository.GetCarWithModelAndBrandAsync(dto.CarId);
+            if (car == null || car.IsDeleted)
+                throw new BusinessException("Araç bulunamadı.");
+
+            var pickupLocation = await _locationRepository.GetAsync(l => l.Id == dto.PickupLocationId && !l.IsDeleted)
+                                 ?? throw new BusinessException("Alış lokasyonu bulunamadı.");
+
+            var dropoffLocation = await _locationRepository.GetAsync(l => l.Id == dto.DropoffLocationId && !l.IsDeleted)
+                                  ?? throw new BusinessException("Teslim lokasyonu bulunamadı.");
+
+            // Çakışma kontrolü (başka rezervasyonlarla)
             var hasConflict = (await _reservationRepository.GetReservationsByCarIdAsync(dto.CarId))
                 .Any(r =>
                     r.Id != reservation.Id &&
@@ -78,6 +86,8 @@ namespace RentACarProject.Application.Features.Reservation.Commands
             reservation.StartDate = dto.StartDate;
             reservation.EndDate = dto.EndDate;
             reservation.TotalPrice = car.DailyPrice * totalDays;
+            reservation.ModifiedByUserId = _currentUserService.UserId;
+            reservation.ModifiedDate = DateTime.UtcNow;
 
             await _unitOfWork.SaveChangesAsync();
 
@@ -87,8 +97,8 @@ namespace RentACarProject.Application.Features.Reservation.Commands
                 CarPlate = car.Plate,
                 CarModel = car.Model.Name,
                 CarBrand = car.Model.Brand.Name,
-                PickupLocation = pickup.Name,
-                DropoffLocation = dropoff.Name,
+                PickupLocation = pickupLocation.Name,
+                DropoffLocation = dropoffLocation.Name,
                 StartDate = reservation.StartDate,
                 EndDate = reservation.EndDate,
                 TotalPrice = reservation.TotalPrice,

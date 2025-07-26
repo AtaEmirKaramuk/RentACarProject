@@ -5,7 +5,7 @@ namespace RentACarProject.Domain.Entities
 {
     public class Payment : BaseEntity
     {
-        public Guid PaymentId { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
 
         public Guid ReservationId { get; set; }
         public decimal Amount { get; set; }
@@ -16,18 +16,17 @@ namespace RentACarProject.Domain.Entities
 
         public string? TransactionId { get; set; }
 
-        // Banka havalesi için
+        // Bank transfer
         public string? SenderIban { get; set; }
         public string? SenderName { get; set; }
 
-        // Kredi kartı için
+        // Credit card
         public string? CardHolderName { get; set; }
-        public string? CardNumberMasked { get; set; } // CVC tutulmaz
-        public int ExpireMonth { get; set; }           
-        public int ExpireYear { get; set; }            
+        public string? CardNumberMasked { get; set; }
+        public int ExpireMonth { get; set; }
+        public int ExpireYear { get; set; }
         public int? InstallmentCount { get; set; }
 
-        // Navigation
         public Reservation Reservation { get; set; } = null!;
     }
 }

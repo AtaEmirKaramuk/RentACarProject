@@ -1,11 +1,11 @@
 ﻿using RentACarProject.Domain.Common;
-using System;
 
 namespace RentACarProject.Domain.Entities
 {
-    public class Log
+    public class Log : BaseEntity
     {
         public int Id { get; set; }
+
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string Level { get; set; } = "Info";
         public string Message { get; set; } = string.Empty;
@@ -22,9 +22,7 @@ namespace RentACarProject.Domain.Entities
 
         public int? ResponseTimeMs { get; set; }
 
-        public string? UserId { get; set; }
+        public Guid? UserId { get; set; }
         public string? TraceId { get; set; }
-
-        
     }
 }

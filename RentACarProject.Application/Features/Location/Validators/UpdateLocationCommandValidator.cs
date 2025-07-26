@@ -7,7 +7,7 @@ namespace RentACarProject.Application.Features.Location.Validators
     {
         public UpdateLocationCommandValidator()
         {
-            RuleFor(x => x.Location.LocationId)
+            RuleFor(x => x.Location.Id)
                 .NotEmpty().WithMessage("Lokasyon ID boş olamaz.");
 
             RuleFor(x => x.Location.Name)

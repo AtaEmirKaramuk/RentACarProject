@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
+using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Payment;
-using RentACarProject.Application.Services;
 
 namespace RentACarProject.Application.Features.Payment.Queries
 {
-    public class GetMyPaymentsQueryHandler : IRequestHandler<GetMyPaymentsQuery, List<PaymentResponseDto>>
+    public class GetMyPaymentsQueryHandler : IRequestHandler<GetMyPaymentsQuery, ServiceResponse<List<PaymentResponseDto>>>
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -17,10 +17,10 @@ namespace RentACarProject.Application.Features.Payment.Queries
             _currentUserService = currentUserService;
         }
 
-        public async Task<List<PaymentResponseDto>> Handle(GetMyPaymentsQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<List<PaymentResponseDto>>> Handle(GetMyPaymentsQuery request, CancellationToken cancellationToken)
         {
             if (_currentUserService.UserId == null)
-                throw new UnauthorizedAccessException("Kullanıcı oturum bilgisi bulunamadı.");
+                return new ServiceResponse<List<PaymentResponseDto>> { Success = false, Message = "Kullanıcı oturumu bulunamadı.", Code = "401" };
 
             var userId = _currentUserService.UserId.Value;
 
@@ -32,9 +32,9 @@ namespace RentACarProject.Application.Features.Payment.Queries
                 request.Type
             );
 
-            return payments.Select(p => new PaymentResponseDto
+            var result = payments.Select(p => new PaymentResponseDto
             {
-                PaymentId = p.PaymentId,
+                Id = p.Id,
                 ReservationId = p.ReservationId,
                 Amount = p.Amount,
                 PaymentDate = p.PaymentDate,
@@ -44,6 +44,13 @@ namespace RentACarProject.Application.Features.Payment.Queries
                 SenderIban = p.SenderIban,
                 SenderName = p.SenderName
             }).ToList();
+
+            return new ServiceResponse<List<PaymentResponseDto>>
+            {
+                Success = true,
+                Message = "Kullanıcının ödemeleri listelendi.",
+                Data = result
+            };
         }
     }
 }

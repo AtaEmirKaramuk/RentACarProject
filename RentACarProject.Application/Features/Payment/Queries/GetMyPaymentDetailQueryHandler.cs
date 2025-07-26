@@ -1,13 +1,13 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
+using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Application.Exceptions;
-using RentACarProject.Application.Services;
 
 namespace RentACarProject.Application.Features.Payment.Queries
 {
-    public class GetMyPaymentDetailQueryHandler : IRequestHandler<GetMyPaymentDetailQuery, PaymentResponseDto>
+    public class GetMyPaymentDetailQueryHandler : IRequestHandler<GetMyPaymentDetailQuery, ServiceResponse<PaymentResponseDto>>
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -18,18 +18,19 @@ namespace RentACarProject.Application.Features.Payment.Queries
             _currentUserService = currentUserService;
         }
 
-        public async Task<PaymentResponseDto> Handle(GetMyPaymentDetailQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<PaymentResponseDto>> Handle(GetMyPaymentDetailQuery request, CancellationToken cancellationToken)
         {
             var payment = await _paymentRepository.GetPaymentByIdAsync(request.PaymentId);
+
             if (payment == null || payment.IsDeleted)
-                throw new NotFoundException("Ödeme bulunamadı.");
+                return new ServiceResponse<PaymentResponseDto> { Success = false, Message = "Ödeme bulunamadı.", Code = "404" };
 
             if (payment.Reservation.Customer.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("Bu ödeme kaydına erişim yetkiniz yok.");
 
-            return new PaymentResponseDto
+            var dto = new PaymentResponseDto
             {
-                PaymentId = payment.PaymentId,
+              Id = payment.Id,
                 ReservationId = payment.ReservationId,
                 Amount = payment.Amount,
                 PaymentDate = payment.PaymentDate,
@@ -38,6 +39,13 @@ namespace RentACarProject.Application.Features.Payment.Queries
                 TransactionId = payment.TransactionId,
                 SenderIban = payment.SenderIban,
                 SenderName = payment.SenderName
+            };
+
+            return new ServiceResponse<PaymentResponseDto>
+            {
+                Success = true,
+                Message = "Ödeme detayları getirildi.",
+                Data = dto
             };
         }
     }

@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using RentACarProject.Application.Abstraction.Repositories;
+using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Common;
 using RentACarProject.Application.DTOs.Auth;
 using RentACarProject.Application.Exceptions;
-using RentACarProject.Application.Services;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,9 +12,9 @@ namespace RentACarProject.Application.Features.Auth.Commands
     public class LoginCommandHandler : IRequestHandler<LoginCommand, ServiceResponse<LoginResponseDto>>
     {
         private readonly IUserRepository _userRepository;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public LoginCommandHandler(IUserRepository userRepository, JwtTokenService jwtTokenService)
+        public LoginCommandHandler(IUserRepository userRepository, IJwtTokenService jwtTokenService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
@@ -22,21 +22,21 @@ namespace RentACarProject.Application.Features.Auth.Commands
 
         public async Task<ServiceResponse<LoginResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            // Kullanıcı kontrol
+            // Kullanıcı kontrolü
             var user = await _userRepository.GetByUserNameAsync(request.UserName);
             if (user == null)
             {
                 throw new BusinessException("Kullanıcı bulunamadı.");
             }
 
-            // Şifre kontrol
+            // Şifre kontrolü
             var hashedPassword = HashPassword(request.Password);
             if (user.PasswordHash != hashedPassword)
             {
                 throw new BusinessException("Şifre yanlış.");
             }
 
-            // Token oluştur
+            // JWT token oluşturma
             var token = _jwtTokenService.GenerateToken(user);
 
             return new ServiceResponse<LoginResponseDto>
@@ -46,7 +46,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 Code = "200",
                 Data = new LoginResponseDto
                 {
-                    UserId = user.UserId,
+                    UserId = user.Id,
                     UserName = user.UserName,
                     Email = user.Email ?? "",
                     Role = user.Role.ToString(),

@@ -24,7 +24,7 @@ namespace RentACarProject.Application.Features.Location.Commands
         {
             var dto = request.Location;
 
-            var location = await _locationRepository.GetLocationByIdAsync(dto.LocationId);
+            var location = await _locationRepository.GetLocationByIdAsync(dto.Id);
 
             if (location == null || location.IsDeleted)
                 throw new NotFoundException("Lokasyon bulunamadı.");
@@ -39,7 +39,7 @@ namespace RentACarProject.Application.Features.Location.Commands
 
             return new LocationResponseDto
             {
-                LocationId = location.LocationId,
+                Id = location.Id,
                 Name = location.Name,
                 City = location.City,
                 Address = location.Address,

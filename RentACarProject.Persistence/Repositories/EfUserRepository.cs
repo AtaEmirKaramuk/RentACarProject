@@ -39,13 +39,13 @@ namespace RentACarProject.Persistence.Repositories
         {
             return await _context.Users
                 .Include(u => u.Customer)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User?> GetByIdAsync(Guid userId)
         {
             return await _context.Users
-                .Where(x => !x.IsDeleted && x.UserId == userId)
+                .Where(x => !x.IsDeleted && x.Id == userId)
                 .FirstOrDefaultAsync();
         }
 
@@ -55,6 +55,5 @@ namespace RentACarProject.Persistence.Repositories
                 .Where(x => !x.IsDeleted)
                 .AnyAsync(predicate);
         }
-
     }
 }

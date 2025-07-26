@@ -18,7 +18,7 @@ namespace RentACarProject.Persistence.Repositories
 
         public async Task<Location?> GetLocationByIdAsync(Guid locationId)
         {
-            return await Query().FirstOrDefaultAsync(l => l.LocationId == locationId);
+            return await Query().FirstOrDefaultAsync(l => l.Id == locationId);
         }
     }
 }

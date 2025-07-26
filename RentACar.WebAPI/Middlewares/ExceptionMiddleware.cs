@@ -25,44 +25,47 @@ namespace RentACarProject.API.Middlewares
             }
             catch (Exception ex)
             {
-                var statusCode = (int)HttpStatusCode.InternalServerError;
+                var response = context.Response;
+                response.ContentType = "application/json";
+
+                var statusCode = HttpStatusCode.InternalServerError;
                 var message = "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyiniz.";
                 var code = "UNEXPECTED_ERROR";
 
                 switch (ex)
                 {
                     case BusinessException businessEx when businessEx.Message.Contains("bulunamadı"):
-                        statusCode = (int)HttpStatusCode.NotFound;
+                        statusCode = HttpStatusCode.NotFound;
                         message = businessEx.Message;
                         code = "NOT_FOUND";
                         break;
 
                     case BusinessException businessEx:
-                        statusCode = (int)HttpStatusCode.BadRequest;
+                        statusCode = HttpStatusCode.BadRequest;
                         message = businessEx.Message;
                         code = "BUSINESS_ERROR";
                         break;
 
                     case ValidationException validationEx:
-                        statusCode = (int)HttpStatusCode.UnprocessableEntity;
+                        statusCode = HttpStatusCode.UnprocessableEntity;
                         message = string.Join(" | ", validationEx.Errors.Select(e => e.ErrorMessage));
                         code = "VALIDATION_ERROR";
                         break;
 
                     case UnauthorizedAccessException:
-                        statusCode = (int)HttpStatusCode.Unauthorized;
+                        statusCode = HttpStatusCode.Unauthorized;
                         message = "Yetkisiz erişim. Lütfen giriş yapınız.";
                         code = "UNAUTHORIZED";
                         break;
 
-                    case ForbiddenAccessException forbiddenAccessEx:
-                        statusCode = (int)HttpStatusCode.Forbidden;
+                    case ForbiddenAccessException:
+                        statusCode = HttpStatusCode.Forbidden;
                         message = "Bu kaynağa erişim izniniz yok.";
                         code = "FORBIDDEN";
                         break;
 
                     case NotFoundException notFoundEx:
-                        statusCode = (int)HttpStatusCode.NotFound;
+                        statusCode = HttpStatusCode.NotFound;
                         message = notFoundEx.Message;
                         code = "NOT_FOUND";
                         break;
@@ -70,24 +73,17 @@ namespace RentACarProject.API.Middlewares
 
                 _logger.LogError(ex, "Bir hata oluştu: {Message}", ex.Message);
 
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = statusCode;
-
-                var response = new ServiceResponse<string>
+                response.StatusCode = (int)statusCode;
+                var result = new ServiceResponse<string>
                 {
                     Success = false,
                     Message = message,
-                    Code = code,
-                    Data = null
+                    Code = code
                 };
 
-                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                await response.WriteAsync(JsonSerializer.Serialize(result, options));
             }
         }
-    }
-
-    public class ForbiddenAccessException : Exception
-    {
-        public ForbiddenAccessException(string message = "Erişim engellendi.") : base(message) { }
     }
 }

@@ -63,7 +63,7 @@ namespace RentACarProject.Application.Features.Car.Queries
 
             var result = cars.Select(c => new CarResponseDto
             {
-                Id = c.CarId,
+                Id = c.Id,
                 BrandName = c.Model.Brand.Name,
                 ModelName = c.Model.Name,
                 Year = c.Year,

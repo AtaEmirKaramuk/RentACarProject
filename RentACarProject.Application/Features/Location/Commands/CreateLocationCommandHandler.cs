@@ -23,7 +23,7 @@ namespace RentACarProject.Application.Features.Location.Commands
 
             var location = new DomainLocation
             {
-                LocationId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Name = dto.Name,
                 City = dto.City,
                 Address = dto.Address,
@@ -35,7 +35,7 @@ namespace RentACarProject.Application.Features.Location.Commands
 
             return new LocationResponseDto
             {
-                LocationId = location.LocationId,
+                Id = location.Id,
                 Name = location.Name,
                 City = location.City,
                 Address = location.Address,

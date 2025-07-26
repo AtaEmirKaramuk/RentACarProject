@@ -1,11 +1,10 @@
 ﻿using RentACarProject.Domain.Common;
-using System.ComponentModel.DataAnnotations;
 
 namespace RentACarProject.Domain.Entities
 {
     public class Location : BaseEntity
     {
-        public Guid LocationId { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string City { get; set; } = null!;
         public string Address { get; set; } = null!;

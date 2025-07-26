@@ -21,7 +21,7 @@ namespace RentACarProject.Application.Features.Model.Queries
                 .Include(m => m.Brand)
                 .Select(m => new ModelResponseDto
                 {
-                    Id = m.ModelId,
+                    Id = m.Id,
                     Name = m.Name,
                     BrandId = m.BrandId,
                     BrandName = m.Brand.Name

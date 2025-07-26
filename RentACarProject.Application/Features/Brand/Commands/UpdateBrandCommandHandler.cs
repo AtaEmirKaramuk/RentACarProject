@@ -19,14 +19,14 @@ public class UpdateBrandCommandHandler : IRequestHandler<UpdateBrandCommand, Ser
 
     public async Task<ServiceResponse<BrandResponseDto>> Handle(UpdateBrandCommand request, CancellationToken cancellationToken)
     {
-        var brand = await _brandRepository.GetAsync(x => x.BrandId == request.Brand.Id);
+        var brand = await _brandRepository.GetAsync(x => x.Id == request.Brand.Id);
         if (brand == null)
         {
             throw new BusinessException("Güncellenmek istenen marka bulunamadı.");
         }
 
         var duplicateBrand = await _brandRepository.GetByNameAsync(request.Brand.Name);
-        if (duplicateBrand != null && duplicateBrand.BrandId != request.Brand.Id)
+        if (duplicateBrand != null && duplicateBrand.Id != request.Brand.Id)
         {
             throw new BusinessException("Bu marka ismi başka bir marka tarafından kullanılıyor.");
         }
@@ -38,7 +38,7 @@ public class UpdateBrandCommandHandler : IRequestHandler<UpdateBrandCommand, Ser
 
         var dto = new BrandResponseDto
         {
-            Id = brand.BrandId,
+            Id = brand.Id,
             Name = brand.Name
         };
 

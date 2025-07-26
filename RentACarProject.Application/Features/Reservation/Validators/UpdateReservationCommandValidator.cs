@@ -8,7 +8,7 @@ namespace RentACarProject.Application.Validators.Reservation
         public UpdateReservationCommandValidator()
         {
             RuleFor(x => x.Reservation.Id)
-                .NotEmpty().WithMessage("Rezervasyon ID boş olamaz.");
+                .NotEmpty().WithMessage("Rezervasyon ID girilmelidir.");
 
             RuleFor(x => x.Reservation.CarId)
                 .NotEmpty().WithMessage("Araç seçilmelidir.");
@@ -20,13 +20,13 @@ namespace RentACarProject.Application.Validators.Reservation
                 .NotEmpty().WithMessage("Teslim lokasyonu seçilmelidir.");
 
             RuleFor(x => x.Reservation.StartDate)
-                .NotEmpty().WithMessage("Başlangıç tarihi boş olamaz.");
+                .NotEmpty().WithMessage("Başlangıç tarihi girilmelidir.");
 
             RuleFor(x => x.Reservation.EndDate)
-                .NotEmpty().WithMessage("Bitiş tarihi boş olamaz.");
+                .NotEmpty().WithMessage("Bitiş tarihi girilmelidir.");
 
             RuleFor(x => x.Reservation)
-                .Must(x => x.StartDate < x.EndDate)
+                .Must(r => r.StartDate < r.EndDate)
                 .WithMessage("Başlangıç tarihi, bitiş tarihinden önce olmalıdır.");
         }
     }

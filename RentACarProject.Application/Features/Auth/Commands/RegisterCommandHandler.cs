@@ -56,7 +56,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 // User oluştur
                 var newUser = new User
                 {
-                    UserId = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     UserName = request.UserName,
                     PasswordHash = hashedPassword,
                     Email = request.Email,
@@ -67,7 +67,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                 // Customer oluştur
                 var newCustomer = new Customer
                 {
-                    UserId = newUser.UserId,
+                    UserId = newUser.Id,
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Phone = request.Phone,
@@ -86,7 +86,7 @@ namespace RentACarProject.Application.Features.Auth.Commands
                     Code = "200",
                     Data = new RegisterResponseDto
                     {
-                        UserId = newUser.UserId,
+                        UserId = newUser.Id,
                         UserName = newUser.UserName,
                         Email = newUser.Email,
                         Role = newUser.Role.ToString()

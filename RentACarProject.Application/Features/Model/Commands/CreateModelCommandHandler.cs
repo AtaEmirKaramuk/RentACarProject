@@ -21,7 +21,7 @@ namespace RentACarProject.Application.Features.Model.Commands
 
         public async Task<ServiceResponse<ModelResponseDto>> Handle(CreateModelCommand request, CancellationToken cancellationToken)
         {
-            var brand = await _brandRepository.GetAsync(b => b.BrandId == request.BrandId);
+            var brand = await _brandRepository.GetAsync(b => b.Id == request.BrandId);
             if (brand == null)
             {
                 throw new BusinessException("Bağlı olduğu marka bulunamadı.");
@@ -35,7 +35,7 @@ namespace RentACarProject.Application.Features.Model.Commands
 
             var newModel = new Domain.Entities.Model
             {
-                ModelId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Name = request.Name,
                 BrandId = request.BrandId
             };
@@ -45,9 +45,9 @@ namespace RentACarProject.Application.Features.Model.Commands
 
             var dto = new ModelResponseDto
             {
-                Id = newModel.ModelId,
+                Id = newModel.Id,
                 Name = newModel.Name,
-                BrandId = brand.BrandId,
+                BrandId = brand.Id,
                 BrandName = brand.Name
             };
 

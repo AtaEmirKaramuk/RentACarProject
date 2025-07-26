@@ -21,7 +21,7 @@ namespace RentACarProject.Application.Features.Location.Queries
                 .Where(x => !x.IsDeleted)
                 .Select(loc => new LocationResponseDto
                 {
-                    LocationId = loc.LocationId,
+                    Id = loc.Id,
                     Name = loc.Name,
                     City = loc.City,
                     Address = loc.Address,

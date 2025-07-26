@@ -1,18 +1,21 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using RentACarProject.Application.Abstraction.Services;
+using RentACarProject.Application.Settings;
+using RentACarProject.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using RentACarProject.Domain.Entities;
 
-namespace RentACarProject.Application.Services
+namespace RentACarProject.Infrastructure.Services
 {
-    public class JwtTokenService
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly string _key;
 
-        public JwtTokenService(string key)
+        public JwtTokenService(IOptions<JwtSettings> options)
         {
-            _key = key;
+            _key = options.Value.Key;
         }
 
         public string GenerateToken(User user)
@@ -22,10 +25,10 @@ namespace RentACarProject.Application.Services
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.Role, user.Role.ToString()) //  Enum string'e çevrildi
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

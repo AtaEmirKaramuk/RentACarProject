@@ -19,7 +19,7 @@ namespace RentACarProject.Application.Features.Brand.Commands
 
         public async Task<ServiceResponse<DeletedBrandDto>> Handle(DeleteBrandCommand request, CancellationToken cancellationToken)
         {
-            var brand = await _brandRepository.GetAsync(x => x.BrandId == request.BrandId);
+            var brand = await _brandRepository.GetAsync(x => x.Id == request.BrandId);
 
             if (brand == null)
             {
@@ -31,7 +31,7 @@ namespace RentACarProject.Application.Features.Brand.Commands
 
             var dto = new DeletedBrandDto
             {
-                Id = brand.BrandId,
+                Id = brand.Id,
                 Name = brand.Name
             };
 

@@ -22,7 +22,7 @@ namespace RentACarProject.WebAPI.Controllers.Admin
         public async Task<IActionResult> Create([FromBody] CreateLocationCommand command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = result.LocationId }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut]

@@ -1,8 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RentACarProject.Application.Features.Reservation.Queries;
+using RentACarProject.Application.Features.Payment.Queries;
 using RentACarProject.Application.Features.Reservation.Commands;
+using RentACarProject.Application.Features.Reservation.Queries;
 
 namespace RentACarProject.API.Controllers.Admin
 {
@@ -47,6 +48,14 @@ namespace RentACarProject.API.Controllers.Admin
             return Ok(response);
         }
 
+        [HttpGet("{reservationId}/payments")]
+        public async Task<IActionResult> GetPaymentsByReservationId(Guid reservationId)
+        {
+            var result = await _mediator.Send(new GetPaymentsByReservationIdQuery(reservationId));
+            return Ok(result);
+        }
+
+
         [HttpGet("completed")]
         public async Task<IActionResult> GetCompleted()
         {
@@ -68,6 +77,7 @@ namespace RentACarProject.API.Controllers.Admin
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Cancel(Guid id)

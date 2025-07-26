@@ -3,7 +3,6 @@ using RentACarProject.Application.Abstraction.Repositories;
 using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.DTOs.Payment;
 using RentACarProject.Application.Exceptions;
-using RentACarProject.Application.Services;
 using RentACarProject.Domain.Entities;
 using RentACarProject.Domain.Enums;
 using PaymentEntity = RentACarProject.Domain.Entities.Payment;
@@ -30,7 +29,7 @@ namespace RentACarProject.Application.Features.Payment.Commands
         {
             var dto = request.Payment;
 
-            var payment = await _paymentRepository.GetPaymentByIdAsync(dto.PaymentId);
+            var payment = await _paymentRepository.GetPaymentByIdAsync(dto.Id);
             if (payment == null || payment.IsDeleted)
                 throw new NotFoundException("Ödeme kaydı bulunamadı.");
 
@@ -50,7 +49,7 @@ namespace RentACarProject.Application.Features.Payment.Commands
 
             return new PaymentResponseDto
             {
-                PaymentId = payment.PaymentId,
+                Id = payment.Id,
                 ReservationId = payment.ReservationId,
                 Amount = payment.Amount,
                 PaymentDate = payment.PaymentDate,

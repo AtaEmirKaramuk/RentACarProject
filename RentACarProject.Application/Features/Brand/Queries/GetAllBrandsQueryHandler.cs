@@ -20,7 +20,7 @@ namespace RentACarProject.Application.Features.Brand.Queries
 
             var brandDtos = brands.Select(b => new BrandResponseDto
             {
-                Id = b.BrandId,
+                Id = b.Id,
                 Name = b.Name
             }).ToList();
 

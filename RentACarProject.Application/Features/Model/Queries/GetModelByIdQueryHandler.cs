@@ -19,10 +19,10 @@ namespace RentACarProject.Application.Features.Model.Queries
         {
             var model = await _modelRepository.Query()
                 .Include(m => m.Brand)
-                .Where(m => m.ModelId == request.ModelId)
+                .Where(m => m.Id == request.ModelId)
                 .Select(m => new ModelResponseDto
                 {
-                    Id = m.ModelId,
+                    Id = m.Id,
                     Name = m.Name,
                     BrandId = m.BrandId,
                     BrandName = m.Brand.Name

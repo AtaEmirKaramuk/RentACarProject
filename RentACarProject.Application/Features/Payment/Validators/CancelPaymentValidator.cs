@@ -1,14 +1,11 @@
 ﻿using FluentValidation;
 using RentACarProject.Application.Features.Payment.Commands;
 
-namespace RentACarProject.Application.Validators.Payment
+public class CancelPaymentCommandValidator : AbstractValidator<CancelPaymentCommand>
 {
-    public class CancelPaymentValidator : AbstractValidator<CancelPaymentCommand>
+    public CancelPaymentCommandValidator()
     {
-        public CancelPaymentValidator()
-        {
-            RuleFor(x => x.PaymentId)
-                .NotEmpty().WithMessage("PaymentId boş olamaz.");
-        }
+        RuleFor(x => x.PaymentId)
+            .NotEmpty().WithMessage("Ödeme ID boş olamaz.");
     }
 }

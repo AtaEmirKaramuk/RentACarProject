@@ -21,19 +21,19 @@ namespace RentACarProject.Application.Features.Model.Commands
 
         public async Task<ServiceResponse<ModelResponseDto>> Handle(UpdateModelCommand request, CancellationToken cancellationToken)
         {
-            var model = await _modelRepository.GetAsync(m => m.ModelId == request.ModelId);
+            var model = await _modelRepository.GetAsync(m => m.Id == request.ModelId);
             if (model == null)
             {
                 throw new BusinessException("Model bulunamadı.");
             }
 
-            var brand = await _brandRepository.GetAsync(b => b.BrandId == request.BrandId);
+            var brand = await _brandRepository.GetAsync(b => b.Id == request.BrandId);
             if (brand == null)
             {
                 throw new BusinessException("Bağlı olduğu marka bulunamadı.");
             }
 
-            var existingModel = await _modelRepository.GetAsync(m => m.BrandId == request.BrandId && m.Name == request.Name && m.ModelId != request.ModelId);
+            var existingModel = await _modelRepository.GetAsync(m => m.BrandId == request.BrandId && m.Name == request.Name && m.Id != request.ModelId);
             if (existingModel != null)
             {
                 throw new BusinessException("Bu marka altında aynı isimde bir model zaten mevcut.");
@@ -47,9 +47,9 @@ namespace RentACarProject.Application.Features.Model.Commands
 
             var dto = new ModelResponseDto
             {
-                Id = model.ModelId,
+                Id = model.Id,
                 Name = model.Name,
-                BrandId = brand.BrandId,
+                BrandId = brand.Id,
                 BrandName = brand.Name
             };
 

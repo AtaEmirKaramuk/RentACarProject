@@ -16,7 +16,7 @@ namespace RentACarProject.Application.Features.Brand.Queries
 
         public async Task<ServiceResponse<BrandResponseDto>> Handle(GetBrandByIdQuery request, CancellationToken cancellationToken)
         {
-            var brand = await _brandRepository.GetAsync(b => b.BrandId == request.BrandId);
+            var brand = await _brandRepository.GetAsync(b => b.Id == request.BrandId);
 
             if (brand == null)
             {
@@ -30,7 +30,7 @@ namespace RentACarProject.Application.Features.Brand.Queries
 
             var dto = new BrandResponseDto
             {
-                Id = brand.BrandId,
+                Id = brand.Id,
                 Name = brand.Name
             };
 

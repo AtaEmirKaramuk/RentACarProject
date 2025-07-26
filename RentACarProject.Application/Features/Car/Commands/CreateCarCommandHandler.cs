@@ -25,7 +25,7 @@ namespace RentACarProject.Application.Features.Car.Commands
         {
             var model = await _modelRepository.Query()
                 .Include(m => m.Brand)
-                .FirstOrDefaultAsync(m => m.ModelId == request.ModelId, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == request.ModelId, cancellationToken);
 
             if (model == null)
                 throw new BusinessException("Model bulunamadı.");
@@ -37,7 +37,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
             var newCar = new Domain.Entities.Car
             {
-                CarId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 ModelId = request.ModelId,
                 Year = request.Year,
                 Plate = request.Plate,
@@ -54,7 +54,7 @@ namespace RentACarProject.Application.Features.Car.Commands
 
             var dto = new CarResponseDto
             {
-                Id = newCar.CarId,
+                Id = newCar.Id,
                 BrandName = model.Brand.Name,
                 ModelName = model.Name,
                 Year = newCar.Year,

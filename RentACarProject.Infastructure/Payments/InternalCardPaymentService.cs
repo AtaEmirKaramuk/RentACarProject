@@ -42,7 +42,7 @@ namespace RentACarProject.Infrastructure.Services.Payments
 
             var payment = new Payment
             {
-                PaymentId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 ReservationId = dto.ReservationId,
                 Amount = dto.Amount,
                 PaymentDate = DateTime.UtcNow,
@@ -63,7 +63,7 @@ namespace RentACarProject.Infrastructure.Services.Payments
 
             return new PaymentResponseDto
             {
-                PaymentId = payment.PaymentId,
+                Id = payment.Id,
                 ReservationId = payment.ReservationId,
                 Amount = payment.Amount,
                 PaymentDate = payment.PaymentDate,

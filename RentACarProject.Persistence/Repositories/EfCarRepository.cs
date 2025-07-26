@@ -38,7 +38,7 @@ namespace RentACarProject.Persistence.Repositories
             return await _context.Cars
                 .Include(c => c.Model)
                 .ThenInclude(m => m.Brand)
-                .FirstOrDefaultAsync(c => c.CarId == carId);
+                .FirstOrDefaultAsync(c => c.Id == carId);
         }
 
 

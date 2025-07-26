@@ -27,7 +27,7 @@ namespace RentACarProject.Application.Features.Brand.Commands
 
             var newBrand = new Domain.Entities.Brand
             {
-                BrandId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Name = request.Brand.Name
             };
 
@@ -36,7 +36,7 @@ namespace RentACarProject.Application.Features.Brand.Commands
 
             var dto = new BrandResponseDto
             {
-                Id = newBrand.BrandId,
+                Id = newBrand.Id,
                 Name = newBrand.Name
             };
 

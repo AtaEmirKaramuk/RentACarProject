@@ -5,7 +5,7 @@ namespace RentACarProject.Domain.Entities
 {
     public class Car : BaseEntity
     {
-        public Guid CarId { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public Guid ModelId { get; set; }
         public int Year { get; set; }
         public string Plate { get; set; } = null!;
