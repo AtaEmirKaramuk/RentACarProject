@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Data;
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -8,15 +10,27 @@ using RentACarProject.API.Middlewares;
 using RentACarProject.Application.Abstraction.Services;
 using RentACarProject.Application.Behaviors;
 using RentACarProject.Application.Features.Auth.Commands;
-using RentACarProject.Application.Settings; // <-- ✅ JwtSettings burada
+using RentACarProject.Application.Settings;
 using RentACarProject.Application.Validators.Auth;
 using RentACarProject.Infrastructure.DependencyInjection;
 using RentACarProject.Infrastructure.Services;
 using RentACarProject.Persistence.Context;
 using RentACarProject.Persistence.DependencyInjection;
 using RentACarProject.Persistence.Seed;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 🔹 Serilog yapılandırması
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
+
 
 // 🔹 Controllers & Swagger
 builder.Services.AddControllers();
@@ -97,8 +111,37 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// 🔹 Başlangıç logu
+Log.Information("Uygulama başarıyla başlatıldı.");
 app.Run();
+
+// 🔧 MSSQL Log ColumnOptions
+ColumnOptions GetSqlColumnOptions()
+{
+    var columnOptions = new ColumnOptions();
+
+    columnOptions.Store.Remove(StandardColumn.Properties);
+    columnOptions.Store.Remove(StandardColumn.MessageTemplate);
+
+    columnOptions.AdditionalColumns = new Collection<SqlColumn>
+    {
+        new SqlColumn("Path", SqlDbType.NVarChar, dataLength: 300),
+        new SqlColumn("Method", SqlDbType.NVarChar, dataLength: 10),
+        new SqlColumn("StatusCode", SqlDbType.Int),
+        new SqlColumn("RequestBody", SqlDbType.NVarChar, dataLength: -1),
+        new SqlColumn("ResponseBody", SqlDbType.NVarChar, dataLength: -1),
+        new SqlColumn("IpAddress", SqlDbType.NVarChar, dataLength: 50),
+        new SqlColumn("UserAgent", SqlDbType.NVarChar, dataLength: 300),
+        new SqlColumn("ResponseTimeMs", SqlDbType.BigInt),
+        new SqlColumn("UserId", SqlDbType.NVarChar, dataLength: 100),
+        new SqlColumn("TraceId", SqlDbType.NVarChar, dataLength: 100),
+    };
+
+    return columnOptions;
+}

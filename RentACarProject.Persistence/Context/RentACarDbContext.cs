@@ -22,7 +22,6 @@ namespace RentACarProject.Persistence.Context
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Brand> Brands => Set<Brand>();
         public DbSet<Model> Models => Set<Model>();
-        public DbSet<Log> Logs => Set<Log>();
         public DbSet<Car> Cars => Set<Car>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
